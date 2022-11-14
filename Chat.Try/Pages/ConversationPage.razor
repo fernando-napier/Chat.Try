@@ -1,0 +1,64 @@
+﻿@inherits ChatPage;
+
+<div class="card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item disabled">Existing Convos</li>
+        @foreach(var conversation in Conversations)
+        {
+            @foreach (var convoUser in conversation.ConversationUsers)
+            {
+                @if (convoUser.UserId != UserId)
+                {
+                    <li class="list-group-item @SelectConversation(conversation)" @onclick="() => SetSelect(conversation)">@convoUser.UserId</li>
+                }
+            }
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public List<Conversations> Conversations { get; set; }
+
+    [Parameter]
+    public EventCallback<Conversations> SelectedConversationChanged { get; set; }
+
+    [Parameter]
+    public Conversations SelectedConversation { get; set; }
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    private string SelectConversation(Conversations conversation) =>
+        IsSelected(conversation) ? "bg-info text-white" : "bg-light";
+
+
+    bool IsSelected(Conversations conversation)
+    {
+        if (SelectedConversation == null)
+        {
+            SelectedConversation = new Conversations();
+        }
+
+        return SelectedConversation.Id == conversation.Id;
+    }
+
+
+    void SetSelect(Conversations conversation)
+    {        
+        if (IsSelected(conversation))
+        {
+            SelectedConversation = new Conversations();
+        }
+        else
+        {
+            SelectedConversation = conversation;
+            SelectedConversationChanged.InvokeAsync(SelectedConversation);
+        }
+    }
+}

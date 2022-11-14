@@ -1,0 +1,59 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.SignalR.Client
+@using Chat.Try.Models
+@inject Chat.Try.Accessors.IUserDbAccessor _userDbAccessor
+@inject Chat.Try.Accessors.IChatDbAccessor _chatAccessor
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@implements IAsyncDisposable
+
+
+@if (DisplayMessageList.Any())
+{
+    <div id="scrollbox">
+    @foreach (var message in DisplayMessageList)
+    {
+        @if (message.UserId == UserId)
+        {
+            <div class="sent">
+                <div class="user">@message.UserId</div>
+                <div class="msg">@message.Message</div>
+            </div>
+        }
+        else
+        {
+            <div class="received">
+                <div class="user">@message.UserId</div>
+                <div class="msg">@message.Message</div>
+            </div>
+        }
+
+    }
+        <hr />
+        @*<textarea class="input-lg" placeholder="enter your comment" @bind="@_newMessage"></textarea>
+        <button class="btn btn-default" @onclick="@(() => SendAsync(_newMessage))">Send</button>*@
+    </div>
+}
+
+@code {
+    private List<DisplayMessage> DisplayMessageList = new();
+    private string UserId { get; set; }
+
+    public async Task GetMessages(Conversations conversation)
+    {
+        var messages = conversation.ConversationUsers.SelectMany(x => x.UserMessages)
+            .Select(x => new DisplayMessage
+                {
+                    UserId = x.ConversationUser.UserId,
+                    Message = x.Message,
+                    CreatedOn = x.CreatedOn
+                });
+        DisplayMessageList = messages.OrderBy(x => x.CreatedOn).ToList();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+}

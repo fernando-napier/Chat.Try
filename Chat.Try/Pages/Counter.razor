@@ -1,0 +1,78 @@
+﻿@page "/counter"
+@using Chat.Try.Db.Models
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Chat.Try.Db.Context.ChatContext _context
+@inject Chat.Try.Accessors.IUserDbAccessor _userDbAccessor
+@inject NavigationManager _navigation
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCountAsync">Click me</button>
+
+@code {
+    private int currentCount = 0;
+    private Db.Models.Counter counter = new Db.Models.Counter();
+    private ClaimsPrincipal user = new ClaimsPrincipal();
+    private string userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeCounterAsync();
+    }
+
+    private async Task InitializeCounterAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            return;
+        }
+
+        userId = _userDbAccessor.GetIdByUser(user.Identity.Name);        
+
+        var existingCounter = _context.Counter.FirstOrDefault(x => x.UserId == userId);
+        if (existingCounter == null)
+        {
+            var newCounter = new Db.Models.Counter
+                {
+                    UserId = userId,
+                };
+            _context.Counter.Add(newCounter);
+            await _context.SaveChangesAsync();
+            counter = newCounter;
+        }
+        else 
+        {
+            counter = existingCounter;
+            currentCount = existingCounter.Count;
+        }
+    }
+
+    private async Task IncrementCountAsync()
+    {
+        try
+        {
+            currentCount++;
+            if (!user.Identity.IsAuthenticated)
+            {
+                return;
+            }
+            counter.Count = currentCount;
+            _context.Counter.Update(counter);
+            await _context.SaveChangesAsync();
+        }
+        catch
+        {
+            base.StateHasChanged();
+        }
+        base.StateHasChanged();
+    }
+}
