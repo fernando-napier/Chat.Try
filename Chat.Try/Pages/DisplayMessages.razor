@@ -60,8 +60,12 @@
                     Message = x.Message,
                     CreatedOn = x.CreatedOn
                 });
-                DisplayMessageList = tempMessages.OrderBy(x => x.CreatedOn).ToList();
-                StateHasChanged();
+
+                if (DisplayMessageList.Count != tempMessages.Count())
+                {
+                    DisplayMessageList = tempMessages.OrderBy(x => x.CreatedOn).ToList();
+                    StateHasChanged();
+                }
             });
         }, null, 0, 15000);
 
