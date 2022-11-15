@@ -18,7 +18,7 @@
                 <input @bind="userSearch" type="text" class="form-control" placeholder="Find a friend" />
             </div>
             <div class="col-3">
-                <button type="button" @onclick="SearchForUser" disabled="@(!IsConnected)" class="btn btn-primary">Send</button>
+                <button type="button" @onclick="SearchForUser" class="btn btn-primary">Send</button>
             </div>
         </div>
         
@@ -31,9 +31,7 @@
         
         @if (SelectedConversation != null)
         {
-            <div class="col-6">
-                Does this work? Convo with @SelectedConversation.ConversationUsers.First(x => x.UserId != _userId).UserId
-            </div>
+            <DisplayMessages Conversation=@SelectedConversation UserId=@_userId/>
         }
     </div>
     
@@ -41,7 +39,7 @@
 
 
 @code{
-    private HubConnection hubConnection;
+    
     private List<Conversations> Conversations = new();
     private Conversations SelectedConversation { get; set; }
     private string _username;
@@ -53,16 +51,12 @@
 
     private DisplayMessages _displayMessages;
 
-    public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+    
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user = authState.User;
-
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
-            .Build();
 
         if (!user.Identity.IsAuthenticated)
         {
@@ -71,17 +65,6 @@
 
         _username = user.Identity.Name;
         _userId = _userDbAccessor.GetIdByUser(_username);
-
-        hubConnection.On<string, string, int>("ReceiveUserMessage", (userId, message, conversationId) =>
-        {
-            Conversations.First(x => x.Id == conversationId)
-                .ConversationUsers.First(x => x.UserId == userId)
-                .UserMessages.Add(new UserMessages { Message = message, CreatedOn = DateTimeOffset.Now });
-
-            StateHasChanged();
-        });
-
-        await hubConnection.StartAsync();
 
         Conversations = _chatAccessor.GetUserConversations(_userId);
         StateHasChanged();
@@ -123,22 +106,7 @@
         }
     }
 
-    //private async Task Send()
-    //{
-    //    if (!string.IsNullOrEmpty(messageInput))
-    //    {
-    //        await hubConnection.SendAsync("SendUserMessage", usernameInput, messageInput);
-
-    //        isUserReadonly = true;
-    //        messageInput = string.Empty;
-    //    }
-    //}
-
     public async ValueTask DisposeAsync()
     {
-        if (hubConnection is not null)
-        {
-            await hubConnection.DisposeAsync();
-        }
     }
 }

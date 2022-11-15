@@ -1,5 +1,6 @@
 ﻿using Chat.Try.Db.Context;
 using Chat.Try.Db.Models;
+using Chat.Try.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Try.Accessors
@@ -9,6 +10,8 @@ namespace Chat.Try.Accessors
         List<Conversations> GetUserConversations(string userId);
         bool SaveConversation(Conversations conversation);
         bool ConversationExists(string user1, string user2);
+        bool SaveNewMessage(Conversations conversation, DisplayMessage displayMessage);
+        List<UserMessages> GetUserMessages(int conversationId);
     }
 
     public class ChatDbAccessor : IChatDbAccessor
@@ -24,7 +27,8 @@ namespace Chat.Try.Accessors
         {
             var conversationIds = _chatContext.ConversationUsers.Where(x => x.UserId == userId).Select(x => x.ConversationId);
             return _chatContext.Conversations.Where(x => conversationIds.Contains(x.Id))
-                .Include(x => x.ConversationUsers).ToList();
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .ToList();
         }
 
         public bool SaveConversation(Conversations conversation)
@@ -38,6 +42,22 @@ namespace Chat.Try.Accessors
             var user1Convos = _chatContext.ConversationUsers.Where(x => x.UserId == user1).Select(x => x.ConversationId).ToList();
             var user2Convos = _chatContext.ConversationUsers.Where(x => x.UserId == user2).Select(x => x.ConversationId).ToList();
             return user1Convos.Any(x => user2Convos.Contains(x));
+        }
+
+        public bool SaveNewMessage(Conversations conversation, DisplayMessage displayMessage)
+        {
+            conversation.ConversationUsers.First(x => x.UserId == displayMessage.UserId)
+                .UserMessages.Add(new UserMessages { Message = displayMessage.Message, CreatedOn = displayMessage.CreatedOn });
+            _chatContext.Update(conversation);
+            return _chatContext.SaveChanges() > 0;
+        }
+
+        public List<UserMessages> GetUserMessages(int conversationId)
+        {
+            return _chatContext.Conversations.AsNoTracking()
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .First(x => x.Id == conversationId)
+                .ConversationUsers.SelectMany(x => x.UserMessages).ToList();
         }
     }
 }

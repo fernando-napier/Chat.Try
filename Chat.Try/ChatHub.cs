@@ -15,9 +15,9 @@ namespace BlazorChat
         /// <param name="userId"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendUserMessage(string userId, string message, int conversationId)
+        public async Task SendUserMessage(string userId, string message)
         {
-            await Clients.User(userId).SendAsync("ReceiveUserMessage", userId, message, conversationId);
+            await Clients.User(userId).SendAsync("ReceiveUserMessage", userId, message);
         }
     }
 }
