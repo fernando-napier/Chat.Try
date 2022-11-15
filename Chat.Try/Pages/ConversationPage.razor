@@ -59,6 +59,7 @@
         {
             SelectedConversation = conversation;
             SelectedConversationChanged.InvokeAsync(SelectedConversation);
+            StateHasChanged();
         }
     }
 }

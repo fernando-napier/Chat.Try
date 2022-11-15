@@ -1,48 +1,98 @@
 ﻿@using System.Security.Claims
 @using Microsoft.AspNetCore.SignalR.Client
 @using Chat.Try.Models
-@inject Chat.Try.Accessors.IUserDbAccessor _userDbAccessor
 @inject Chat.Try.Accessors.IChatDbAccessor _chatAccessor
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @implements IAsyncDisposable
 
-
-@if (DisplayMessageList.Any())
+<div id="scrollbox" class="col-6">
+@foreach (var message in DisplayMessageList)
 {
-    <div id="scrollbox">
-    @foreach (var message in DisplayMessageList)
+    @if (message.UserId == UserId)
     {
-        @if (message.UserId == UserId)
-        {
-            <div class="sent">
-                <div class="user">@message.UserId</div>
-                <div class="msg">@message.Message</div>
-            </div>
-        }
-        else
-        {
-            <div class="received">
-                <div class="user">@message.UserId</div>
-                <div class="msg">@message.Message</div>
-            </div>
-        }
-
+        <div class="bg-secondary">
+            <div class="user">@message.UserId</div>
+            <div class="msg">@message.Message</div>
+            <div class="small">@message.CreatedOn.ToString("F")</div>
+        </div>
     }
-        <hr />
-        @*<textarea class="input-lg" placeholder="enter your comment" @bind="@_newMessage"></textarea>
-        <button class="btn btn-default" @onclick="@(() => SendAsync(_newMessage))">Send</button>*@
-    </div>
+    else
+    {
+        <div class=" bg-success">
+            <div class="user">@message.UserId</div>
+            <div class="msg">@message.Message</div>
+            <div class="small">@message.CreatedOn.ToString("F")</div>
+        </div>
+    }
+
 }
+    <hr />
+    <textarea class="input-lg" placeholder="enter your comment" @bind="@NewMessage"></textarea>
+    <button class="btn btn-default" @onclick="@(() => SendAsync(NewMessage))">Send</button>
+</div>
 
 @code {
-    private List<DisplayMessage> DisplayMessageList = new();
-    private string UserId { get; set; }
+    [Parameter]
+    public Conversations Conversation { get; set; } 
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public string OtherUserId { get; set; }
 
-    public async Task GetMessages(Conversations conversation)
+    private HubConnection HubConnection;
+    private List<DisplayMessage> DisplayMessageList = new();
+    private string NewMessage { get; set; }
+
+    public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
+
+    protected override async Task OnInitializedAsync()
     {
-        var messages = conversation.ConversationUsers.SelectMany(x => x.UserMessages)
+        var timer = new System.Threading.Timer((_) =>
+        {
+            InvokeAsync(async () =>
+            {
+                // Update the UI
+                var tempMessages = _chatAccessor.GetUserMessages(Conversation.Id).Select(x => new DisplayMessage
+                {
+                    UserId = x.ConversationUser.UserId,
+                    Message = x.Message,
+                    CreatedOn = x.CreatedOn
+                });
+
+                if (DisplayMessageList.Count != tempMessages.Count())
+                {
+                    DisplayMessageList = tempMessages.OrderBy(x => x.CreatedOn).ToList();
+                    StateHasChanged();
+                }
+            });
+        }, null, 0, 15000);
+
+        //HubConnection = new HubConnectionBuilder()
+        //    .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        //    .Build();
+
+        //HubConnection.On<string, string>("ReceiveUserMessage", (userId, message) =>
+        //{
+        //    Conversation.ConversationUsers.First(x => x.UserId == userId)
+        //        .UserMessages.Add(new UserMessages { Message = message, CreatedOn = DateTimeOffset.Now });
+
+        //    StateHasChanged();
+        //});
+
+        //await HubConnection.StartAsync();
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        parameters.TryGetValue<Conversations>(nameof(Conversation), out var convo);
+        Conversation = convo;
+        parameters.TryGetValue<string>(nameof(UserId), out var userId);
+        UserId = userId;
+        OtherUserId = Conversation.ConversationUsers.First(x => x.UserId != UserId).UserId;
+
+        var messages = Conversation.ConversationUsers.SelectMany(x => x.UserMessages)
             .Select(x => new DisplayMessage
                 {
                     UserId = x.ConversationUser.UserId,
@@ -50,6 +100,27 @@
                     CreatedOn = x.CreatedOn
                 });
         DisplayMessageList = messages.OrderBy(x => x.CreatedOn).ToList();
+
+        await base.SetParametersAsync(parameters);
+        StateHasChanged();
+    }
+
+    private async Task SendAsync(string messageInput)
+    {
+        if (!string.IsNullOrEmpty(messageInput))
+        {
+            var newMessage = new DisplayMessage()
+            {
+                UserId = UserId,
+                Message = messageInput,
+                CreatedOn = DateTimeOffset.Now,
+            };
+
+            DisplayMessageList.Add(newMessage);
+            _chatAccessor.SaveNewMessage(Conversation, newMessage);
+
+            //await HubConnection.SendAsync("SendUserMessage", UserId, messageInput);
+        }
     }
 
     public ValueTask DisposeAsync()
