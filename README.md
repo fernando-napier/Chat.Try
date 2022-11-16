@@ -6,7 +6,8 @@ This application is one where a user should be able to communicate with a peer o
 
 This is a current snapshot of what the chat capabilities look like (This is short due to 10MB size constraint by Github)
 
-https://user-images.githubusercontent.com/11913005/202089172-73275bb6-1973-4af9-aaa8-147e19236fb7.mp4
+[![Chat.Try Demo](https://i.postimg.cc/J4gPC8tK/Screenshot-2022-11-15-223722.png)](https://youtu.be/R_Ky4iRMuhs)
+
 
 Things being worked on:
 * ~~Database design~~
