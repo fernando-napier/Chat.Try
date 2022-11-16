@@ -13,6 +13,7 @@ Things being worked on:
 * ~~Auto generation of dbcontext via EFCore Power Tools~~
 * ~~Parent and child razor component interaction~~
 * ~~Basic logic/html/css to be able interact with other users~~
+* Notification upon new message received
 * User Search auto-complete
 * SignalR realtime messaging between users
   * currently 15 second refresh for new messages
