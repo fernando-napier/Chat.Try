@@ -7,6 +7,11 @@ namespace Chat.Try.Db.Models
 {
     public partial class AspNetUsers
     {
+        public AspNetUsers()
+        {
+            ConversationUsers = new HashSet<ConversationUsers>();
+        }
+
         public string Id { get; set; }
         public string UserName { get; set; }
         public string NormalizedUserName { get; set; }
@@ -22,5 +27,7 @@ namespace Chat.Try.Db.Models
         public DateTimeOffset? LockoutEnd { get; set; }
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
+
+        public virtual ICollection<ConversationUsers> ConversationUsers { get; set; }
     }
 }

@@ -10,20 +10,17 @@
 @implements IAsyncDisposable
 
 <div class="container overflow-auto bg-white">
-    @if (Conversations.Any())
-    {
-        <p>Search for new convos!</p>
-        <div class="row">
-            <div class="col-3">
-                <input @bind="userSearch" type="text" class="form-control" placeholder="Find a friend" />
-            </div>
-            <div class="col-3">
-                <button type="button" @onclick="SearchForUser" class="btn btn-primary">Send</button>
-            </div>
+    <p>Search for new convos!</p>
+    <div class="row">
+        <div class="col-3">
+            <input @bind="userSearch" type="text" class="form-control" placeholder="Find a friend" />
         </div>
+        <div class="col-3">
+            <button type="button" @onclick="SearchForUser" class="btn btn-primary">Send</button>
+        </div>
+    </div>
         
-        <br />
-    }
+    <br />
     <div class="row justify-content-between">
         <div class="col-3">
             <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" />
@@ -100,7 +97,7 @@
 
             if (isSaved)
             {
-                Conversations.Add(conversation);
+                Conversations.Add(_chatAccessor.GetConversation(conversation.Id));
                 StateHasChanged();
             }   
         }

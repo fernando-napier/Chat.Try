@@ -12,6 +12,7 @@ namespace Chat.Try.Accessors
         bool ConversationExists(string user1, string user2);
         bool SaveNewMessage(Conversations conversation, DisplayMessage displayMessage);
         List<UserMessages> GetUserMessages(int conversationId);
+        Conversations GetConversation(int conversationId);
     }
 
     public class ChatDbAccessor : IChatDbAccessor
@@ -27,6 +28,7 @@ namespace Chat.Try.Accessors
         {
             var conversationIds = _chatContext.ConversationUsers.Where(x => x.UserId == userId).Select(x => x.ConversationId);
             return _chatContext.Conversations.Where(x => conversationIds.Contains(x.Id))
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .ToList();
         }
@@ -34,6 +36,7 @@ namespace Chat.Try.Accessors
         public bool SaveConversation(Conversations conversation)
         {
             _chatContext.Conversations.Add(conversation);
+            _chatContext.ConversationUsers.AddRange(conversation.ConversationUsers);
             return _chatContext.SaveChanges() > 0;
         }
 
@@ -55,9 +58,18 @@ namespace Chat.Try.Accessors
         public List<UserMessages> GetUserMessages(int conversationId)
         {
             return _chatContext.Conversations.AsNoTracking()
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .First(x => x.Id == conversationId)
                 .ConversationUsers.SelectMany(x => x.UserMessages).ToList();
+        }
+
+        public Conversations GetConversation(int id)
+        {
+            return _chatContext.Conversations
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .First(x => x.Id == id);
         }
     }
 }

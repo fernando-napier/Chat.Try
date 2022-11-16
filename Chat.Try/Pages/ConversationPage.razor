@@ -9,7 +9,7 @@
             {
                 @if (convoUser.UserId != UserId)
                 {
-                    <li class="list-group-item @SelectConversation(conversation)" @onclick="() => SetSelect(conversation)">@convoUser.UserId</li>
+                    <li class="list-group-item @SelectConversation(conversation)" @onclick="() => SetSelect(conversation)">@convoUser.User.UserName</li>
                 }
             }
         }
