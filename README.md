@@ -5,6 +5,7 @@ This is my attempt at creating a Blazor Server application. Blazor Server is ver
 This application is one where a user should be able to communicate with a peer one to one. However I setup the db tables in such a way that a Conversation could contain many ConversationUsers and so groups would be available. However that's a future enhancement. For now here is a demo of how the application functions:
 
 This is a current snapshot of what the chat capabilities look like (This is short due to 10MB size constraint by Github)
+
 https://user-images.githubusercontent.com/11913005/202089172-73275bb6-1973-4af9-aaa8-147e19236fb7.mp4
 
 Things being worked on:
