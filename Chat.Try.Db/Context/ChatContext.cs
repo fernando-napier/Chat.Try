@@ -57,6 +57,12 @@ namespace Chat.Try.Db.Context
                     .HasForeignKey(d => d.ConversationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Converstion_On_ConversationUsers");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.ConversationUsers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ConversationUser_On_User");
             });
 
             modelBuilder.Entity<Conversations>(entity =>

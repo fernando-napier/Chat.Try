@@ -8,30 +8,72 @@
 @implements IAsyncDisposable
 
 <div id="scrollbox" class="col-6">
+    <div class="scroll chatboard">
 @foreach (var message in DisplayMessageList)
 {
     @if (message.UserId == UserId)
     {
-        <div class="bg-secondary">
-            <div class="user">@message.UserId</div>
-            <div class="msg">@message.Message</div>
-            <div class="small">@message.CreatedOn.ToString("F")</div>
+        <div class="card-body sent">
+            <h4 class="card-title">@message.Message</h4>
+            <div class="small">You @message.CreatedOn.ToString("g")</div>
         </div>
     }
     else
     {
-        <div class=" bg-success">
-            <div class="user">@message.UserId</div>
-            <div class="msg">@message.Message</div>
-            <div class="small">@message.CreatedOn.ToString("F")</div>
+        <div class="card-body received">
+            <h4 class="card-title">@message.Message</h4>
+            <div class="small">@message.UserName @message.CreatedOn.ToString("g")</div>
         </div>
     }
 
-}
+ }
+    </div>    
     <hr />
-    <textarea class="input-lg" placeholder="enter your comment" @bind="@NewMessage"></textarea>
-    <button class="btn btn-default" @onclick="@(() => SendAsync(NewMessage))">Send</button>
-</div>
+    <div class="row">
+        <div class="col-9">
+            <input @bind="NewMessage" type="text" class="form-control" placeholder="Send a Message" />
+        </div>
+        <div class="col-3">
+            <button type="button" @onclick="@(() => SendAsync())" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+    @*<textarea class="input-lg" placeholder="enter your comment" @bind="@NewMessage"></textarea>
+    <button class="btn btn-lg" @onclick="@(() => SendAsync(NewMessage))">Send</button>*@
+</div>  
+
+<style>
+    .scroll {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .chatboard {
+        display: grid;
+        width: 100%;
+        grid-gap: 0.6rem;
+        max-width: 40rem;
+    }
+
+    .sent,
+    .received {
+        padding: 1%;
+        min-width: 20rem;
+        border-radius: 0.6rem;
+    }
+
+    .received {
+        justify-self: left;
+        background-color: #0A2472;
+        color: white;
+    }
+
+    .sent {
+        text-align: right;
+        justify-self: right;
+        align-content: right;
+        background-color: #A6E1FA;
+    }
+</style>
 
 @code {
     [Parameter]
@@ -57,13 +99,14 @@
                 var tempMessages = _chatAccessor.GetUserMessages(Conversation.Id).Select(x => new DisplayMessage
                 {
                     UserId = x.ConversationUser.UserId,
+                    UserName = x.ConversationUser.User.UserName,
                     Message = x.Message,
                     CreatedOn = x.CreatedOn
                 });
 
                 if (DisplayMessageList.Count != tempMessages.Count())
                 {
-                    DisplayMessageList = tempMessages.OrderBy(x => x.CreatedOn).ToList();
+                    DisplayMessageList = tempMessages.OrderByDescending(x => x.CreatedOn).ToList();
                     StateHasChanged();
                 }
             });
@@ -96,29 +139,32 @@
             .Select(x => new DisplayMessage
                 {
                     UserId = x.ConversationUser.UserId,
+                    UserName = x.ConversationUser.User.UserName,
                     Message = x.Message,
                     CreatedOn = x.CreatedOn
                 });
-        DisplayMessageList = messages.OrderBy(x => x.CreatedOn).ToList();
+        DisplayMessageList = messages.OrderByDescending(x => x.CreatedOn).ToList();
 
         await base.SetParametersAsync(parameters);
         StateHasChanged();
     }
 
-    private async Task SendAsync(string messageInput)
+    private async Task SendAsync()
     {
-        if (!string.IsNullOrEmpty(messageInput))
+        if (!string.IsNullOrEmpty(NewMessage))
         {
             var newMessage = new DisplayMessage()
             {
                 UserId = UserId,
-                Message = messageInput,
+                Message = NewMessage,
                 CreatedOn = DateTimeOffset.Now,
             };
 
             DisplayMessageList.Add(newMessage);
+            DisplayMessageList = DisplayMessageList.OrderByDescending(x => x.CreatedOn).ToList();
             _chatAccessor.SaveNewMessage(Conversation, newMessage);
-
+            NewMessage = null;
+            StateHasChanged();
             //await HubConnection.SendAsync("SendUserMessage", UserId, messageInput);
         }
     }

@@ -18,6 +18,7 @@ namespace Chat.Try.Db.Models
         public DateTimeOffset CreatedOn { get; set; }
 
         public virtual Conversations Conversation { get; set; }
+        public virtual AspNetUsers User { get; set; }
         public virtual ICollection<UserMessages> UserMessages { get; set; }
     }
 }
