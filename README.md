@@ -8,10 +8,13 @@ This is a current snapshot of what the chat capabilities look like (Clicking on 
 
 [![Chat.Try Demo](https://i.postimg.cc/J4gPC8tK/Screenshot-2022-11-15-223722.png)](https://youtu.be/R_Ky4iRMuhs)
 
+Here is an updated UI version as of 11/18/22:
+
+[![Screenshot-2022-11-18-165319.png](https://i.postimg.cc/yxzjFCQm/Screenshot-2022-11-18-165319.png)](https://postimg.cc/9RJyhKj0)
+
 Here is what the db components look like, the forking of the arrows implies a one-to-many relationship between the tables. These tables relate to each other via foreign keys, are represented in the DbContext, and allow for easy inclusion of the right data when passing messages between users.
 
 [![Untitled-Diagram-drawio.png](https://i.postimg.cc/66vB3htB/Untitled-Diagram-drawio.png)](https://postimg.cc/0rPTXDz4)
-
 
 
 Things being worked on:

@@ -9,7 +9,18 @@
             {
                 @if (convoUser.UserId != UserId)
                 {
-                    <li class="list-group-item @SelectConversation(conversation)" @onclick="() => SetSelect(conversation)">@convoUser.User.UserName</li>
+                    var recentMessage = conversation.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+                    <div class="chat_list @SelectConversation(conversation)" @onclick="() => SetSelect(conversation)">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>@convoUser.User.UserName<span class="chat_date">@(recentMessage?.CreatedOn.ToString("MM/dd/yy HH:mm") ?? "")</span></h5>
+                                <p>
+                                    @(recentMessage?.Message ?? "No messages yet")
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 }
             }
         }
