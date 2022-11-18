@@ -1,23 +1,55 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <div class=navbar-nav>            
-            <a class="nav-link" aria-current="page" href="#">Home</a>
-            <a class="nav-link" href="chat">Chat</a>
-            <a class="nav-link" href="Counter">Counter</a>
-            <a class="nav-link" href="Identity/Account/Manage">Logged in as @context.User.Identity?.Name!</a>
-            <form method="post" action="Identity/Account/LogOut">
-                <button type="submit" class="nav-link btn btn-link">Log out</button>
-            </form>
+        <div class="navbar-nav">
+          <hr id="nav-vr1" style="width: 2px; height: inherit; margin-right:5px;">
+          <div class="d-lg-inline-flex">
+                <a class="nav-link" aria-current="page" href="#">Home</a>
+                <a class="nav-link" href="chat">Chat</a>
+                <a class="nav-link" href="Counter">Counter</a>
+            </div>
+            <hr id="nav-vr2" style="width: 2px; height: inherit; margin-right:5px; margin-left:5px;">
+            <hr id="nav-hr"/>
+            <div class="d-lg-inline-flex nav-border-left">
+                <a class="nav-link" href="Identity/Account/Manage">Logged in as @context.User.Identity?.Name!</a>
+                <form method="post" action="Identity/Account/LogOut">
+                    <button type="submit" class="nav-link btn btn-link">Log out</button>
+                </form>
+            </div>
         </div>
     </Authorized>
     <NotAuthorized>
         <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="Identity/Account/Register">Register</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="Identity/Account/Login">Log in</a>
-            </li>
+          <a class="nav-link" href="Identity/Account/Register">Register</a>
+          <a class="nav-link" href="Identity/Account/Login">Log in</a>
         </ul>
     </NotAuthorized>
 </AuthorizeView>
+
+<style>
+    
+    @@media screen and (max-width: 991px) {
+        #nav-vr1, #nav-vr2 {
+            display: none;
+        }
+
+        #nav-hr {
+            display: inherit;
+            color: black;
+            padding-right: 50px;
+            padding-left: 50px;
+            width: 3px;
+        }
+        
+    }
+
+    @@media screen and (min-width: 992 px) {
+        #nav-vr1, #nav-vr2 {
+            display: inherit;
+        }
+
+        #nav-hr {
+            display: none;
+        }
+    }
+    
+</style>
