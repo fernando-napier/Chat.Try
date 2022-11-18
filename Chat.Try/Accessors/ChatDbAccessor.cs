@@ -30,6 +30,7 @@ namespace Chat.Try.Accessors
             return _chatContext.Conversations.Where(x => conversationIds.Contains(x.Id))
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .OrderByDescending(x => x.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(y => y.CreatedOn).FirstOrDefault())
                 .ToList();
         }
 
