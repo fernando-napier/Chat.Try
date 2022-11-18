@@ -1,14 +1,23 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <a href="chat">Chat</a>
-        <a href="counter">Counter</a>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</a>
-        <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        <div class=navbar-nav>            
+            <a class="nav-link" aria-current="page" href="#">Home</a>
+            <a class="nav-link" href="chat">Chat</a>
+            <a class="nav-link" href="Counter">Counter</a>
+            <a class="nav-link" href="Identity/Account/Manage">Logged in as @context.User.Identity?.Name!</a>
+            <form method="post" action="Identity/Account/LogOut">
+                <button type="submit" class="nav-link btn btn-link">Log out</button>
+            </form>
+        </div>
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="Identity/Account/Register">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Identity/Account/Login">Log in</a>
+            </li>
+        </ul>
     </NotAuthorized>
 </AuthorizeView>
