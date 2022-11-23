@@ -1,7 +1,7 @@
 # Chat.Try
 
 <details>
-  <summary>#Summary of the project</summary>
+  <summary><h3>Summary of the project</h3></summary>
 
 This is my attempt at creating a Blazor Server application. Blazor Server is very handy for pure backend developers because it keeps all of the logic out of the browser. 
 
@@ -10,7 +10,7 @@ This application is one where a user should be able to communicate with a peer o
 </details>
 
 <details>
-  <summary>#Demo of the project</summary>
+  <summary><h3>Demo of the project</h3></summary>
 
 This is a current snapshot of what the chat capabilities look like (Clicking on the image will take you to youtube)
   
@@ -23,7 +23,7 @@ Here is an updated UI version as of 11/18/22:
 </details>
 
 <details>
-  <summary>#Database schema for Chat.Try</summary>
+  <summary><h3>Database schema for Chat.Try</h3></summary>
 
 Here is what the db components look like, the forking of the arrows implies a one-to-many relationship between the tables. These tables relate to each other via foreign keys, are represented in the DbContext, and allow for easy inclusion of the right data when passing messages between users.
 
@@ -32,7 +32,7 @@ Here is what the db components look like, the forking of the arrows implies a on
 </details>
 
 <details>
-  <summary>#How to clone and run locally</summary>
+  <summary><h3>How to clone and run locally</h3></summary>
 
 1) Ensure you have Dotnet 6 and Sql Server installed.l
 2) Clone Repo
@@ -42,7 +42,7 @@ Here is what the db components look like, the forking of the arrows implies a on
 </details>
 
 <details>
-  <summary>#Things in development</summary>
+  <summary><h3>Things in development</h3></summary>
 
   
 * ~~Database design~~
