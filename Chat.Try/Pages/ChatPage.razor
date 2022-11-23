@@ -17,12 +17,18 @@
               <h4>Recent</h4>
             </div>
             <div class="srch_bar">
-              <div class="stylish-input-group">
-                <input type="text" class="search-bar" @bind=userSearch  placeholder="Search" >
-               @* <span class="input-group-addon">*@
-                <button type="button" @onclick="SearchForUser">=></button>
-               @* </span> *@
-              </div>
+              @*<div class="stylish-input-group">*@
+                        <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search by title">
+                        @if(UserSearchResults != null && UserSearchResults.Any())
+                        {
+                            <ul class="list-group" style="position: absolute; z-index: 100;">
+                                @foreach(var userChosen in UserSearchResults)
+                                {
+                                    <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
+                                }
+                            </ul>
+                        }
+              @*</div>*@
             </div>
           </div>
           <div class="inbox_chat">
@@ -47,12 +53,13 @@
 </div>
 
 @code{
-
+    private List<string> UserSearchResults { get; set; }
     private List<Conversations> Conversations = new();
     private Conversations SelectedConversation { get; set; }
     private string _username;
     private string _userId;
-    private string userSearch;
+    private string UserSearch { get; set; }
+    private string ResultUserChosen;
     private string NewMessage;
     private bool isUserReadonly = false;
     private ClaimsPrincipal user = new ClaimsPrincipal();
@@ -75,11 +82,11 @@
         StateHasChanged();
     }
 
-    private async Task SearchForUser()
+    private async Task CreateUserConversation(string userChosen)
     {
-        if (!string.IsNullOrWhiteSpace(userSearch))
+        if (!string.IsNullOrWhiteSpace(userChosen))
         {
-            var anotherUser = _userDbAccessor.GetIdByUser(userSearch);
+            var anotherUser = _userDbAccessor.GetIdByUser(userChosen);
             if (string.IsNullOrWhiteSpace(anotherUser))
             {
                 await JsRuntime.InvokeVoidAsync("alert", "user not found");
@@ -107,9 +114,21 @@
             {
                 Conversations.Add(_chatAccessor.GetConversation(conversation.Id));
                 Conversations.OrderBy(x => x.ConversationUsers.SelectMany(y => y.UserMessages).OrderByDescending(z => z.CreatedOn).FirstOrDefault().CreatedOn);
+                UserSearch = string.Empty;
+                UserSearchResults = new List<string>();
                 StateHasChanged();
             }   
         }
+    }
+
+    private void SearchForUser()
+    {
+        if (!string.IsNullOrWhiteSpace(UserSearch))
+        {
+            var existingUserConvos = Conversations.SelectMany(x => x.ConversationUsers).Select(x => x.User.UserName).Distinct().ToList();
+            UserSearchResults = _userDbAccessor.SearchForUsers(UserSearch, existingUserConvos);
+            StateHasChanged();
+        }        
     }
 
     private void SendMessage()
