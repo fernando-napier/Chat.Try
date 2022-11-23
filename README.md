@@ -34,9 +34,9 @@ Here is what the db components look like, the forking of the arrows implies a on
 <details>
   <summary><h3>How to clone and run locally</h3></summary>
 
-1) Ensure you have Dotnet 6 and Sql Server installed.l
+1) Ensure you have Dotnet 6 and Sql Server installed.
 2) Clone Repo
-3) Use Sql Server to Resore DB using the backup located in ./Chat.Try.Db/DatabaseBackup/Chat.bak
+3) Use Sql Server to Resore DB using the backup located [here](https://github.com/fernando-napier/Chat.Try/tree/main/Chat.Try.Db/DatabaseBackup)
 4) Run project and create users to chat back and forth with! 
 
 </details>
