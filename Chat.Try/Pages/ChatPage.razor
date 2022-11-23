@@ -17,18 +17,16 @@
               <h4>Recent</h4>
             </div>
             <div class="srch_bar">
-              @*<div class="stylish-input-group">*@
-                        <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search by title">
-                        @if(UserSearchResults != null && UserSearchResults.Any())
+                <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search by title">
+                @if(UserSearchResults != null && UserSearchResults.Any())
+                {
+                    <ul class="list-group" style="position: absolute; z-index: 100;">
+                        @foreach(var userChosen in UserSearchResults)
                         {
-                            <ul class="list-group" style="position: absolute; z-index: 100;">
-                                @foreach(var userChosen in UserSearchResults)
-                                {
-                                    <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
-                                }
-                            </ul>
+                            <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
                         }
-              @*</div>*@
+                    </ul>
+                }
             </div>
           </div>
           <div class="inbox_chat">
