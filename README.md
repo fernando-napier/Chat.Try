@@ -50,10 +50,10 @@ Here is what the db components look like, the forking of the arrows implies a on
 * ~~Parent and child razor component interaction~~
 * ~~Basic logic/html/css to be able interact with other users~~
 * Notification upon new message received
-* User Search auto-complete
+* ~~User Search auto-complete~~
 * SignalR realtime messaging between users
   * currently 15 second refresh for new messages
-* Better UI
+* ~~Better UI~~
 * Emoji support
 * ~~Data migration for easy cloning and setup~~
 * Allow for group chats
