@@ -13,6 +13,7 @@ namespace Chat.Try.Accessors
         bool SaveNewMessage(Conversations conversation, DisplayMessage displayMessage);
         List<UserMessages> GetUserMessages(int conversationId);
         Conversations GetConversation(int conversationId);
+        List<Conversations> RefreshConversations(string userId);
     }
 
     public class ChatDbAccessor : IChatDbAccessor
@@ -71,6 +72,16 @@ namespace Chat.Try.Accessors
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .First(x => x.Id == id);
+        }
+
+        public List<Conversations> RefreshConversations(string userId)
+        {
+            var conversationIds = _chatContext.ConversationUsers.Where(x => x.UserId == userId).Select(x => x.ConversationId);
+            return _chatContext.Conversations.AsNoTracking().Where(x => conversationIds.Contains(x.Id))
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .OrderByDescending(x => x.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(y => y.CreatedOn).FirstOrDefault())
+                .ToList();
         }
     }
 }

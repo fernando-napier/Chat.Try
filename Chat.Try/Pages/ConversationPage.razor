@@ -1,4 +1,5 @@
 ﻿@inherits ChatPage;
+@inject Chat.Try.Accessors.IChatDbAccessor _chatAccessor
 
 <div class="card">
     <ul class="list-group list-group-flush">
@@ -10,6 +11,11 @@
                 @if (convoUser.UserId != UserId)
                 {
                     var recentMessage = conversation.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+                    var sentOrReceived = recentMessage == null ? "None" : null;
+                    if (sentOrReceived == null)
+                    {
+                        sentOrReceived = recentMessage.ConversationUser.UserId == UserId ? "Sent" : "Received";
+                    }
                     <div class="chat_list @SelectConversation(conversation)" @onclick="() => SetSelect(conversation)">
                         <div class="chat_people">
                             <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
@@ -18,6 +24,8 @@
                                 <p>
                                     @(recentMessage?.Message ?? "No messages yet")
                                 </p>
+                                <small>@sentOrReceived</small>
+                                
                             </div>
                         </div>
                     </div>
@@ -26,6 +34,12 @@
         }
     </ul>
 </div>
+
+<style>
+    small {
+        font-size: 10px;
+    }
+</style>
 
 @code {
     [Parameter]
@@ -43,6 +57,35 @@
     public ValueTask DisposeAsync()
     {
         return ValueTask.CompletedTask;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var timer = new System.Threading.Timer((_) =>
+        {
+            InvokeAsync(async () =>
+            {
+                // Update the UI
+                var refreshConversations = _chatAccessor.RefreshConversations(UserId);
+                var refreshConversationsFlag = false;
+
+                foreach(var conversation in refreshConversations)
+                {
+                    var existingConvo = Conversations.FirstOrDefault(x => x.Id == conversation.Id);
+                    if (existingConvo == null || 
+                        existingConvo.ConversationUsers.SelectMany(x => x.UserMessages).Count() 
+                        != conversation.ConversationUsers.SelectMany(x => x.UserMessages).Count())
+                    {
+                        refreshConversationsFlag = true;
+                    }
+                }
+                if (refreshConversationsFlag)
+                {
+                    Conversations = refreshConversations;
+                    StateHasChanged();
+                }
+            });
+        }, null, 0, 15000);
     }
 
     private string SelectConversation(Conversations conversation) =>

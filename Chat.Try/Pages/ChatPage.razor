@@ -20,7 +20,7 @@
               <div class="stylish-input-group">
                 <input type="text" class="search-bar" @bind=userSearch  placeholder="Search" >
                @* <span class="input-group-addon">*@
-                <button type="button" @onclick="SearchForUser"> Send </button>
+                <button type="button" @onclick="SearchForUser">=></button>
                @* </span> *@
               </div>
             </div>
@@ -169,17 +169,24 @@
     .recent_heading {
         float: left;
         width: 40%;
+        margin-bottom: 10px;
     }
 
     .srch_bar {
         display: inline-block;
+        vertical-align: bottom;
         text-align: right;
-        width: 60%;
+        width: auto;
+        float: right;
     }
+
+    /*.stylish-input-group {
+        vertical-align: bottom;
+    }*/
 
     .headind_srch {
         padding: 10px 29px 10px 20px;
-        overflow: hidden;
+        overflow: auto;
         border-bottom: 1px solid #c4c4c4;
     }
 
