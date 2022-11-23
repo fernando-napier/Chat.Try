@@ -16,6 +16,12 @@ Here is what the db components look like, the forking of the arrows implies a on
 
 [![Untitled-Diagram-drawio.png](https://i.postimg.cc/66vB3htB/Untitled-Diagram-drawio.png)](https://postimg.cc/0rPTXDz4)
 
+Setup for Running Locally:
+
+1) Ensure you have Dotnet 6 and Sql Server installed.l
+2) Clone Repo
+3) Use Sql Server to Resore DB using the backup located in ./Chat.Try.Db/DatabaseBackup/Chat.bak
+4) Run project and create users to chat back and forth with! 
 
 Things being worked on:
 * ~~Database design~~
@@ -28,7 +34,7 @@ Things being worked on:
   * currently 15 second refresh for new messages
 * Better UI
 * Emoji support
-* Data migration for easy cloning and setup
+~~* Data migration for easy cloning and setup~~
 * Allow for group chats
 * encrypt user messages to ensure user data isn't being monitored
 * Deploy as a website
