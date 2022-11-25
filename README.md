@@ -3,9 +3,9 @@
 
 <h3>Summary of the project</h3>
 
-This is my attempt at creating a Blazor Server application. Blazor Server is very handy for pure backend developers because it is almost purely a backend application and the UI elenemts are updated via SignalR.
+This is my attempt at creating a Blazor Server application. Blazor Server is very handy for backend developers because it is almost purely a backend application and the UI elenemts are updated via SignalR.
 
-As of 11/25/22 I have deployed this application to my personal azure cloud. The site is https://fennorad.azurewebsites.net/ and will continually be getting updates because the application is being built into a docker image and deployed to Azure via Github Actions. Most changes from now on will constitute a PR/MR as changes will affect the availability of the site.
+As of 11/25/22 I have deployed this application to my personal azure cloud. The site is https://fennorad.azurewebsites.net/ and will continually be getting updates because the application has deploy pipelines on the `main` repo branch. Most changes from now on will constitute a PR/MR as changes will affect the availability of the site.
 
 If you would like to play around use:  
 User: `example@user.com`  
@@ -38,6 +38,7 @@ Password: `Password1!`
 * Allow for group chats
 * encrypt user messages to ensure user data isn't being monitored
 * ~~Deploy as a website~~ [the site is live](https://fennorad.azurewebsites.net/)
+* ~~Add CI/CD to main branch for deployments~~
 
 </details>
 
