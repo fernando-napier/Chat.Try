@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Try.Db", "Chat.Try.Db\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1D0106FE-3658-4723-B61B-47E07F28094C}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\main_fennorad-cicd.yml = .github\workflows\main_fennorad-cicd.yml
 		README.md = README.md
 	EndProjectSection
 EndProject

@@ -17,7 +17,7 @@
               <h4>Recent</h4>
             </div>
             <div class="srch_bar">
-                <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search by title">
+                <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search for Users">
                 @if(UserSearchResults != null && UserSearchResults.Any())
                 {
                     <ul class="list-group" style="position: absolute; z-index: 100;">
