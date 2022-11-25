@@ -1,5 +1,44 @@
 ﻿@page "/"
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>Hello, authenticated world!</h1>
+        @if(user != null)
+        {
+            <p>Thank you for joining us today @user.Identity.Name!</p>
+        }
+        else
+        {
+            <p>How did you get here without a user!?!!? are you the criminals from the statistics?!?!</p>
+        }
+
+    </Authorized>
+
+
+    <NotAuthorized>
+        <h1>Hello, unauthenticated world!</h1>
+        <p>In order to interact with others </p>
+    </NotAuthorized>
+ 
+</AuthorizeView>
+
+@code{
+
+    private ClaimsPrincipal user { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            user = null;
+        }
+
+    }
+}
