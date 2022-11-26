@@ -9,11 +9,50 @@
 
 <PageTitle>Counter</PageTitle>
 
-<h1>Counter</h1>
+<h2>Counter</h2>
 
 <p role="status">Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCountAsync">Click me</button>
+
+<AuthorizeView>
+    <Authorized>
+        <hr />
+        <h2>Leaderboard</h2>
+        <table class="table" title="Counter Leaderboard">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">User</th>
+              <th scope="col">Count</th>
+            </tr>
+          </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>Mark</td>
+          <td>Otto</td>
+          <td>mdo</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>Jacob</td>
+          <td>Thornton</td>
+          <td>fat</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>Larry</td>
+          <td>the Bird</td>
+          <td>twitter</td>
+        </tr>
+      </tbody>
+      </table>
+    </Authorized>
+    <NotAuthorized>
+        <p>You can click the counter button however your count will only be saved if you login or register</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private int currentCount = 0;
