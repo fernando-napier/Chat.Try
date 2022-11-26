@@ -10,8 +10,26 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    needs: dbup
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
   dbup:
     runs-on: ubuntu-latest
+    needs: build
     env:
       Project: Chat.Try.DbUp
 
@@ -33,7 +51,7 @@ jobs:
       - name: Run dbUp
         run: dotnet run -p ./${PROJECT} ConnectionStrings:Chat="${{ secrets.CHAT_DB_CONNECTIONSTRING }}"
     
-  build:
+  publish:
     runs-on: ubuntu-latest
     needs: dbup
 
@@ -60,7 +78,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: publish
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
