@@ -3,11 +3,7 @@
 
 name: Build and deploy ASP.Net Core app to Azure Web App - fennorad
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: push
 
 jobs:
 
@@ -27,6 +23,7 @@ jobs:
         run: dotnet build --configuration Release
 
   dbup:
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
     needs: build
     env:
@@ -51,6 +48,7 @@ jobs:
         run: dotnet run -p ./$Project ConnectionStrings:Chat="${{ secrets.CHAT_DB_CONNECTIONSTRING }}"
     
   publish:
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
     needs: dbup
 
@@ -76,6 +74,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
     needs: publish
     environment:
