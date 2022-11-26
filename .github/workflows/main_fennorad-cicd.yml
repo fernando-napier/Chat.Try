@@ -48,7 +48,7 @@ jobs:
         run: dotnet build --configuration Release ./$Project
       
       - name: Run dbUp
-        run: dotnet run -p ./${PROJECT} ConnectionStrings:Chat="${{ secrets.CHAT_DB_CONNECTIONSTRING }}"
+        run: dotnet run -p ./$Project ConnectionStrings:Chat="${{ secrets.CHAT_DB_CONNECTIONSTRING }}"
     
   publish:
     runs-on: ubuntu-latest
