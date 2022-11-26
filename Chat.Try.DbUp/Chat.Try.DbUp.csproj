@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>919dfc0e-5ab4-4fde-a1ad-92c86e7fdea7</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\1.AddCounterUserUniqueIndex.sql" />
+    <None Remove="Scripts\2.AddForeignKeyCounterToUser.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\1.AddCounterUserUniqueIndex.sql" />
+    <EmbeddedResource Include="Scripts\2.AddForeignKeyCounterToUser.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <PackageReference Include="dbup-sqlserver" Version="5.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\launchSettings.json">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

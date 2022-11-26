@@ -1,0 +1,1 @@
+﻿CREATE UNIQUE INDEX counter_userid_index ON chat.Counter (UserId);

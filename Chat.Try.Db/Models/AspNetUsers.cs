@@ -28,6 +28,7 @@ namespace Chat.Try.Db.Models
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
 
+        public virtual Counter Counter { get; set; }
         public virtual ICollection<ConversationUsers> ConversationUsers { get; set; }
     }
 }

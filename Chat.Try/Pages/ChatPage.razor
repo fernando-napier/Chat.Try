@@ -9,46 +9,56 @@
 @inject IJSRuntime JsRuntime
 @implements IAsyncDisposable
 
-<div class="messaging">
-      <div class="inbox_msg">
-        <div class="inbox_people">
-          <div class="headind_srch">
-            <div class="recent_heading">
-              <h4>Recent</h4>
+<AuthorizeView>
+    <Authorized>
+        <div class="messaging">
+            <div class="inbox_msg">
+            <div class="inbox_people">
+                <div class="headind_srch">
+                <div class="recent_heading">
+                    <h4>Recent</h4>
+                </div>
+                <div class="srch_bar">
+                    <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search for Users">
+                    @if(UserSearchResults != null && UserSearchResults.Any())
+                    {
+                        <ul class="list-group" style="position: absolute; z-index: 100;">
+                            @foreach(var userChosen in UserSearchResults)
+                            {
+                                <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
+                            }
+                        </ul>
+                    }
+                </div>
+                </div>
+                <div class="inbox_chat">
+                    <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" />
+                </div>
             </div>
-            <div class="srch_bar">
-                <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search for Users">
-                @if(UserSearchResults != null && UserSearchResults.Any())
-                {
-                    <ul class="list-group" style="position: absolute; z-index: 100;">
-                        @foreach(var userChosen in UserSearchResults)
-                        {
-                            <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
-                        }
-                    </ul>
-                }
+            <div class="mesgs">
+                <div class="msg_history">
+                    @if (SelectedConversation != null)
+                    {
+                        <DisplayMessages @ref=_displayMessages Conversation=@SelectedConversation UserId=@_userId />
+                    }
+                </div>
+                <div class="type_msg">
+                <div class="input_msg_write">
+                    <input type="text" class="write_msg" @bind=NewMessage placeholder="Type a message" />
+                    <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
+                </div>
+                </div>
             </div>
-          </div>
-          <div class="inbox_chat">
-                <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" />
-          </div>
+            </div>
         </div>
-        <div class="mesgs">
-          <div class="msg_history">
-                @if (SelectedConversation != null)
-                {
-                    <DisplayMessages @ref=_displayMessages Conversation=@SelectedConversation UserId=@_userId />
-                }
-          </div>
-          <div class="type_msg">
-            <div class="input_msg_write">
-              <input type="text" class="write_msg" @bind=NewMessage placeholder="Type a message" />
-              <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
-            </div>
-          </div>
-        </div>
-      </div>
-</div>
+    </Authorized>
+
+    <NotAuthorized>
+        <h1>Hello, inauthentic user!</h1>
+        <p>In order to interact with others Login or Register</p>
+    </NotAuthorized>
+ 
+</AuthorizeView>
 
 @code{
     private List<string> UserSearchResults { get; set; }

@@ -3,13 +3,10 @@
 
 name: Build and deploy ASP.Net Core app to Azure Web App - fennorad
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: push
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
 
@@ -25,8 +22,52 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
+  dbup:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      Project: Chat.Try.DbUp
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+          include-prerelease: true
+
+      - name: Restore dotnet
+        run: dotnet restore ./$Project
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release ./$Project
+      
+      - name: Run dbUp
+        run: dotnet run -p ./$Project ConnectionStrings:Chat="${{ secrets.CHAT_DB_CONNECTIONSTRING }}"
+    
+  publish:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    needs: dbup
+    env:
+      Project: Chat.Try
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release ./$Project
+
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release ./$Project -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
@@ -35,8 +76,9 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
-    needs: build
+    needs: publish
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}

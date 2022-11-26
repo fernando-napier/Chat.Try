@@ -1,0 +1,3 @@
+﻿ALTER TABLE chat.Counter
+ADD CONSTRAINT FK_Counter_On_User
+FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id);
