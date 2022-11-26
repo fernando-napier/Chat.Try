@@ -74,9 +74,16 @@ namespace Chat.Try.Db.Context
             {
                 entity.ToTable("Counter", "chat");
 
-                entity.Property(e => e.UserId)
-                    .IsRequired()
-                    .HasMaxLength(450);
+                entity.HasIndex(e => e.UserId, "counter_userid_index")
+                    .IsUnique();
+
+                entity.Property(e => e.UserId).IsRequired();
+
+                entity.HasOne(d => d.User)
+                    .WithOne(p => p.Counter)
+                    .HasForeignKey<Counter>(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Counter_On_User");
             });
 
             modelBuilder.Entity<UserMessages>(entity =>

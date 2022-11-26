@@ -14,6 +14,10 @@ namespace Chat.Try.Accessors
         List<UserMessages> GetUserMessages(int conversationId);
         Conversations GetConversation(int conversationId);
         List<Conversations> RefreshConversations(string userId);
+        Counter? GetCounter(string userId);
+        bool SaveCounter(Counter counter);
+        bool UpdateCounter(Counter counter);
+        List<Counter> GetLeaderboard();
     }
 
     public class ChatDbAccessor : IChatDbAccessor
@@ -82,6 +86,28 @@ namespace Chat.Try.Accessors
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .OrderByDescending(x => x.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(y => y.CreatedOn).FirstOrDefault())
                 .ToList();
+        }
+
+        public Counter? GetCounter(string userId)
+        {
+            return _chatContext.Counter.FirstOrDefault(x => x.UserId == userId);
+        }
+
+        public bool SaveCounter(Counter counter)
+        {
+            _chatContext.Counter.Add(counter);
+            return _chatContext.SaveChanges() > 0;
+        }
+
+        public List<Counter> GetLeaderboard()
+        {
+            return _chatContext.Counter.AsNoTracking().Include(x => x.User).OrderByDescending(x => x.Count).Take(10).ToList();
+        }
+
+        public bool UpdateCounter(Counter counter)
+        {
+            _chatContext.Counter.Update(counter);
+            return _chatContext.SaveChanges() > 0;
         }
     }
 }
