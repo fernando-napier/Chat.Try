@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - main
-      - Add-DbUp
   workflow_dispatch:
 
 jobs:
@@ -31,8 +30,8 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release ./$Project
       
-      #- name: Run dbUp
-      #  run: dotnet run -p ./${PROJECT} ConnectionStrings:Chat="${{ secrets.CHAT_DB_CONNECTIONSTRING }}"
+      - name: Run dbUp
+        run: dotnet run -p ./${PROJECT} ConnectionStrings:Chat="${{ secrets.CHAT_DB_CONNECTIONSTRING }}"
     
   build:
     runs-on: ubuntu-latest
