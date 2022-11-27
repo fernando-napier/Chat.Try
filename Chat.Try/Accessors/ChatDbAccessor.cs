@@ -67,7 +67,7 @@ namespace Chat.Try.Accessors
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .First(x => x.Id == conversationId)
-                .ConversationUsers.SelectMany(x => x.UserMessages).ToList();
+                .ConversationUsers.SelectMany(x => x.UserMessages).OrderBy(x => x.CreatedOn).ToList();
         }
 
         public Conversations GetConversation(int id)
