@@ -101,7 +101,7 @@
 
                 if (DisplayMessageList.Count != tempMessages.Count())
                 {
-                    DisplayMessageList = tempMessages.OrderByDescending(x => x.CreatedOn).ToList();
+                    DisplayMessageList = tempMessages.OrderBy(x => x.CreatedOn).ToList();
                     StateHasChanged();
                 }
             });
@@ -138,7 +138,7 @@
                     Message = x.Message,
                     CreatedOn = x.CreatedOn
                 });
-        DisplayMessageList = messages.OrderByDescending(x => x.CreatedOn).ToList();
+        DisplayMessageList = messages.OrderBy(x => x.CreatedOn).ToList();
 
         await base.SetParametersAsync(parameters);
         StateHasChanged();

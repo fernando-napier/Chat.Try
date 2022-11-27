@@ -23,7 +23,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration.GetValue<string>("Azure:SignalR:ConnectionString"));
+//builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration.GetValue<string>("Azure:SignalR:ConnectionString"));
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddResponseCompression(opts =>
