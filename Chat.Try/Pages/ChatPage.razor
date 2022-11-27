@@ -46,7 +46,7 @@
                     </div>
                     <div class="type_msg">
                     <div class="input_msg_write">
-                        <input type="text" class="write_msg" @bind=NewMessage placeholder="Type a message" />
+                            <input type="text" class="write_msg" @onkeyup="SendMessageOnKeyPress" @bind=NewMessage placeholder="Type a message" />
                         <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
                     </div>
                 </div>
@@ -161,6 +161,14 @@
             UserSearchResults = _userDbAccessor.SearchForUsers(UserSearch, existingUserConvos);
             StateHasChanged();
         }        
+    }
+
+    private void SendMessageOnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            SendMessage();
+        }
     }
 
     private void SendMessage()
