@@ -4,9 +4,11 @@ using Chat.Try.Areas.Identity;
 using Chat.Try.Data;
 using Chat.Try.Db.Context;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,11 @@ builder.Services.AddDbContext<ChatContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
+    options.SignIn.RequireConfirmedAccount = false;
+}).AddEntityFrameworkStores<ApplicationDbContext>()
+  .AddDefaultTokenProviders();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration.GetValue<string>("Azure:SignalR:ConnectionString"));

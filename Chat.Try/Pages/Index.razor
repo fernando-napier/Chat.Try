@@ -1,6 +1,13 @@
 ﻿@page "/"
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager;
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHostEnvironmentAuthenticationStateProvider HostAuthentication
+@inject NavigationManager navManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 <PageTitle>Fennorad</PageTitle>
 
@@ -10,18 +17,22 @@
         @if(user != null)
         {
             <p>Thank you for joining us today @user.Identity.Name!</p>
+            <p>If you'd like to use the features on this site click on either <a href="chat">Chat</a> or <a href="counter">Counter</a> to join in on the fun</p>
         }
         else
         {
-            <p>How did you get here without a user!?!!? are you the criminals from the statistics?!?!</p>
+            <p>This is a landing page for the example user. If you refresh the page you will be logged out. If you would like to maintain logged in state then you will need to properly register or login</p>
+            <p>If you'd like to use the features on this site click on either <a href="chat">Chat</a> or <a href="counter">Counter</a> to join in on the fun</p>
         }
 
     </Authorized>
 
 
     <NotAuthorized>
-        <h1>Hello, inauthentic user!</h1>
+        <h1>Hello,  user!</h1>
         <p>In order to interact with others Login or Register</p>
+        <p>If you just want to take a peek inside, login using our example user</p>
+        <button @onclick=Submit>Sign in as the example user</button>
     </NotAuthorized>
  
 </AuthorizeView>
@@ -39,6 +50,29 @@
         {
             user = null;
         }
+    }
 
+    protected async Task Submit()
+    {
+        var user = await UserManager.FindByNameAsync("example@user.com");
+        var valid = await SignInManager.UserManager.CheckPasswordAsync(user, "Password1!");
+
+        if (valid)
+        {
+            var principal = await SignInManager.CreateUserPrincipalAsync(user);
+
+            var identity = new ClaimsIdentity(
+                principal.Claims,
+                Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme
+            );
+            principal = new System.Security.Claims.ClaimsPrincipal(identity);
+            HostAuthentication.SetAuthenticationState(Task.FromResult(new AuthenticationState(principal)));
+
+            // now the authState is updated
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            navManager.NavigateTo("#", true);
+
+        }
     }
 }
