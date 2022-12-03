@@ -11,7 +11,9 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="@(!IsCollapsed ? "collapse": "") navbar-collapse" id="navbarNav">
-                    <LoginDisplay />
+                    <CascadingValue Value="this">
+                        <LoginDisplay />
+                    </CascadingValue>
                 </div>
             </div>
         </nav>
@@ -27,7 +29,7 @@
 
     private bool IsCollapsed { get; set; } = false;
 
-    private void AddCollapse()
+    public void AddCollapse()
     {
         IsCollapsed = !IsCollapsed;
     }

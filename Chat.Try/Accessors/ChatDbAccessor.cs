@@ -23,16 +23,18 @@ namespace Chat.Try.Accessors
     public class ChatDbAccessor : IChatDbAccessor
     {
         private readonly ChatContext _chatContext;
+        private readonly IServiceScopeFactory _serviceScope;
 
-        public ChatDbAccessor(ChatContext chatContext)
+        public ChatDbAccessor(ChatContext chatContext, IServiceScopeFactory serviceScope)
         {
             _chatContext = chatContext;
+            _serviceScope = serviceScope;
         }
 
         public List<Conversations> GetUserConversations(string userId)
         {
-            var conversationIds = _chatContext.ConversationUsers.Where(x => x.UserId == userId).Select(x => x.ConversationId);
-            return _chatContext.Conversations.Where(x => conversationIds.Contains(x.Id))
+            var conversationIds = _chatContext.ConversationUsers.AsNoTracking().Where(x => x.UserId == userId).Select(x => x.ConversationId);
+            return _chatContext.Conversations.AsNoTracking().Where(x => conversationIds.Contains(x.Id))
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .OrderByDescending(x => x.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(y => y.CreatedOn).FirstOrDefault())
@@ -48,17 +50,22 @@ namespace Chat.Try.Accessors
 
         public bool ConversationExists(string user1, string user2)
         {
-            var user1Convos = _chatContext.ConversationUsers.Where(x => x.UserId == user1).Select(x => x.ConversationId).ToList();
-            var user2Convos = _chatContext.ConversationUsers.Where(x => x.UserId == user2).Select(x => x.ConversationId).ToList();
+            var user1Convos = _chatContext.ConversationUsers.AsNoTracking().Where(x => x.UserId == user1).Select(x => x.ConversationId).ToList();
+            var user2Convos = _chatContext.ConversationUsers.AsNoTracking().Where(x => x.UserId == user2).Select(x => x.ConversationId).ToList();
             return user1Convos.Any(x => user2Convos.Contains(x));
         }
 
         public bool SaveNewMessage(Conversations conversation, DisplayMessage displayMessage)
         {
-            conversation.ConversationUsers.First(x => x.UserId == displayMessage.UserId)
-                .UserMessages.Add(new UserMessages { Message = displayMessage.Message, CreatedOn = displayMessage.CreatedOn });
-            _chatContext.Update(conversation);
-            return _chatContext.SaveChanges() > 0;
+            using var scope = _serviceScope.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ChatContext>();
+            var conversationUser = context.ConversationUsers.First(x => x.UserId == displayMessage.UserId && x.ConversationId == conversation.Id);
+            conversationUser.UserMessages.Add(new UserMessages { Message = displayMessage.Message, CreatedOn = displayMessage.CreatedOn });
+            context.Update(conversationUser);
+            var successFlag = context.SaveChanges() > 0;
+
+            conversation = GetConversation(conversation.Id);
+            return successFlag;
         }
 
         public List<UserMessages> GetUserMessages(int conversationId)
@@ -67,12 +74,12 @@ namespace Chat.Try.Accessors
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .First(x => x.Id == conversationId)
-                .ConversationUsers.SelectMany(x => x.UserMessages).OrderBy(x => x.CreatedOn).ToList();
+                .ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(x => x.CreatedOn).ToList();
         }
 
         public Conversations GetConversation(int id)
         {
-            return _chatContext.Conversations
+            return _chatContext.Conversations.AsNoTracking()
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
                 .First(x => x.Id == id);
@@ -80,7 +87,7 @@ namespace Chat.Try.Accessors
 
         public List<Conversations> RefreshConversations(string userId)
         {
-            var conversationIds = _chatContext.ConversationUsers.Where(x => x.UserId == userId).Select(x => x.ConversationId);
+            var conversationIds = _chatContext.ConversationUsers.AsNoTracking().Where(x => x.UserId == userId).Select(x => x.ConversationId);
             return _chatContext.Conversations.AsNoTracking().Where(x => conversationIds.Contains(x.Id))
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
@@ -101,7 +108,9 @@ namespace Chat.Try.Accessors
 
         public List<Counter> GetLeaderboard()
         {
-            return _chatContext.Counter.AsNoTracking().Include(x => x.User).OrderByDescending(x => x.Count).Take(10).ToList();
+            return _chatContext.Counter.AsNoTracking()
+                .Include(x => x.User)
+                .OrderByDescending(x => x.Count).Take(10).ToList();
         }
 
         public bool UpdateCounter(Counter counter)

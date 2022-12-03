@@ -49,6 +49,12 @@
     public EventCallback<Conversations> SelectedConversationChanged { get; set; }
 
     [Parameter]
+    public EventCallback<List<Conversations>> RefreshConversationsChanged { get; set; }
+
+    [Parameter]
+    public List<Conversations> RefreshConversations { get; set; }
+
+    [Parameter]
     public Conversations SelectedConversation { get; set; }
 
     [Parameter]
@@ -66,26 +72,37 @@
             InvokeAsync(async () =>
             {
                 // Update the UI
-                var refreshConversations = _chatAccessor.RefreshConversations(UserId);
-                var refreshConversationsFlag = false;
+                var refreshConversationsFlag = RefreshConvos();
 
-                foreach(var conversation in refreshConversations)
-                {
-                    var existingConvo = Conversations.FirstOrDefault(x => x.Id == conversation.Id);
-                    if (existingConvo == null || 
-                        existingConvo.ConversationUsers.SelectMany(x => x.UserMessages).Count() 
-                        != conversation.ConversationUsers.SelectMany(x => x.UserMessages).Count())
-                    {
-                        refreshConversationsFlag = true;
-                    }
-                }
                 if (refreshConversationsFlag)
                 {
-                    Conversations = refreshConversations;
                     StateHasChanged();
                 }
             });
         }, null, 0, 15000);
+    }
+
+    private bool RefreshConvos()
+    {
+        var refreshConversations = _chatAccessor.RefreshConversations(UserId);
+        var refreshConversationsFlag = false;
+
+        foreach (var conversation in refreshConversations)
+        {
+            var existingConvo = Conversations.FirstOrDefault(x => x.Id == conversation.Id);
+            if (existingConvo == null ||
+                existingConvo.ConversationUsers.SelectMany(x => x.UserMessages).Count()
+                != conversation.ConversationUsers.SelectMany(x => x.UserMessages).Count())
+            {
+                refreshConversationsFlag = true;
+            }
+        }
+        if (refreshConversationsFlag)
+        {
+            Conversations = refreshConversations;
+            RefreshConversations = refreshConversations;
+        }
+        return refreshConversationsFlag;
     }
 
     private string SelectConversation(Conversations conversation) =>
@@ -104,15 +121,18 @@
 
 
     void SetSelect(Conversations conversation)
-    {        
+    {
+        RefreshConvos();
         if (IsSelected(conversation))
         {
-            SelectedConversation = new Conversations();
+            SelectedConversationChanged.InvokeAsync(SelectedConversation);
+            RefreshConversationsChanged.InvokeAsync(RefreshConversations);
         }
         else
         {
             SelectedConversation = conversation;
             SelectedConversationChanged.InvokeAsync(SelectedConversation);
+            RefreshConversationsChanged.InvokeAsync(RefreshConversations);
             StateHasChanged();
         }
     }

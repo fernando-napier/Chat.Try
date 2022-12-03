@@ -13,10 +13,12 @@
     {
         <div class="outgoing_msg">
             <div class="sent_msg">
-                <p>
-                    @message.Message
-                </p>
-                <span class="time_date"> @message?.CreatedOn.ToString("MM/dd/yy HH:mm")</span>
+                <div class="sent_withd_msg">
+                    <p>
+                        @message.Message
+                    </p>
+                    <span class="time_date"> @message?.CreatedOn.ToString("MM/dd/yy HH:mm")</span>
+                </div>
             </div>
         </div>
     }
@@ -79,14 +81,17 @@
     private HubConnection HubConnection;
     private List<DisplayMessage> DisplayMessageList = new();
     private string NewMessage { get; set; }
+    private Timer Timer { get; set; }
 
     public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
 
     protected override async Task OnInitializedAsync()
     {
-        var timer = new System.Threading.Timer((_) =>
+        if (Timer == null)
         {
-            InvokeAsync(async () =>
+            Timer = new System.Threading.Timer((_) =>
+            {
+                InvokeAsync(async () =>
             {
                 // Update the UI
                 var tempMessages = _chatAccessor.GetUserMessages(Conversation.Id).Select(x => new DisplayMessage
@@ -97,13 +102,17 @@
                     CreatedOn = x.CreatedOn
                 });
 
-                if (DisplayMessageList.Count != tempMessages.Count())
-                {
-                    DisplayMessageList = tempMessages.OrderBy(x => x.CreatedOn).ToList();
-                    StateHasChanged();
-                }
+
+                DisplayMessageList = tempMessages.OrderByDescending(x => x.CreatedOn).ToList();
+                StateHasChanged();
+
             });
-        }, null, 0, 15000);
+            }, null, 0, 3000);
+        }
+
+        RefreshMessages();
+
+
 
         //HubConnection = new HubConnectionBuilder()
         //    .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
@@ -118,6 +127,21 @@
         //});
 
         //await HubConnection.StartAsync();
+    }
+
+    private void RefreshMessages()
+    {
+        var tempMessages = _chatAccessor.GetUserMessages(Conversation.Id).Select(x => new DisplayMessage
+            {
+                UserId = x.ConversationUser.UserId,
+                UserName = x.ConversationUser.User.UserName,
+                Message = x.Message,
+                CreatedOn = x.CreatedOn
+            });
+
+
+        DisplayMessageList = tempMessages.OrderByDescending(x => x.CreatedOn).ToList();
+        StateHasChanged();
     }
 
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -136,7 +160,7 @@
                     Message = x.Message,
                     CreatedOn = x.CreatedOn
                 });
-        DisplayMessageList = messages.OrderBy(x => x.CreatedOn).ToList();
+        DisplayMessageList = messages.OrderByDescending(x => x.CreatedOn).ToList();
 
         await base.SetParametersAsync(parameters);
         StateHasChanged();
@@ -149,6 +173,7 @@
 
     public void RefreshMe()
     {
+        RefreshMessages();
         StateHasChanged();
     }
 
