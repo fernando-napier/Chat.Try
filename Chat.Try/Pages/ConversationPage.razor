@@ -60,6 +60,8 @@
     [Parameter]
     public string UserId { get; set; }
 
+    private Timer Timer { get; set; }
+
     public ValueTask DisposeAsync()
     {
         return ValueTask.CompletedTask;
@@ -67,19 +69,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var timer = new System.Threading.Timer((_) =>
+        if (Timer == null)
         {
-            InvokeAsync(async () =>
+            Timer = new System.Threading.Timer((_) =>
             {
-                // Update the UI
-                var refreshConversationsFlag = RefreshConvos();
-
-                if (refreshConversationsFlag)
+                InvokeAsync(async () =>
                 {
-                    StateHasChanged();
-                }
-            });
-        }, null, 0, 15000);
+                    // Update the UI
+                    var refreshConversationsFlag = RefreshConvos();
+                    if (refreshConversationsFlag)
+                    {
+                        StateHasChanged();
+                    }
+                });
+            }, null, 0, 5000);
+        }
     }
 
     private bool RefreshConvos()
