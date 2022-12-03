@@ -3,9 +3,9 @@
         <div class="navbar-nav">
           <hr id="nav-vr1" style="width: 2px; height: inherit; margin-right:5px;">
           <div class="d-lg-inline-flex">
-                <a class="nav-link" aria-current="page" href="#">Home</a>
-                <a class="nav-link" href="chat">Chat</a>
-                <a class="nav-link" href="Counter">Counter</a>
+                <a class="nav-link" @onclick="ClickNav" aria-current="page" href="#">Home</a>
+                <a class="nav-link" @onclick="ClickNav" href="chat">Chat</a>
+                <a class="nav-link" @onclick="ClickNav" href="Counter">Counter</a>
             </div>
             <hr id="nav-vr2" style="width: 2px; height: inherit; margin-right:5px; margin-left:5px;">
             <hr id="nav-hr"/>
@@ -53,3 +53,13 @@
     }
     
 </style>
+
+@code {
+    [CascadingParameter]
+    public MainLayout MainLayout { get; set; }
+
+    private void ClickNav()
+    {
+        MainLayout.AddCollapse();
+    }
+}
