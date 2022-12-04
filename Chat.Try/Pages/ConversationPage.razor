@@ -68,6 +68,12 @@
     public EventCallback<List<Conversations>> RefreshConversationsChanged { get; set; }
 
     [Parameter]
+    public EventCallback<bool> MobileMessageViewFlagChanged { get; set; }
+
+    [Parameter]
+    public bool MobileMessageViewFlag { get; set; }
+
+    [Parameter]
     public List<Conversations> RefreshConversations { get; set; }
 
     [Parameter]
@@ -134,7 +140,6 @@
     {
         var userMessages = convo.ConversationUsers.First(x => x.UserId != UserId).UserMessages;
         return userMessages.Any() && userMessages.Any(x => !x.ReadReceipts.Any());
-
     }
 
     private string SelectConversation(Conversations conversation, bool hasUnreadMessages)
@@ -160,6 +165,7 @@
 
     void SetSelect(Conversations conversation)
     {
+
         _chatAccessor.SetConversationRead(conversation.Id,
                 conversation.ConversationUsers.First(x => x.UserId == UserId).Id);
         RefreshConvos(true);
@@ -174,6 +180,9 @@
             SelectedConversationChanged.InvokeAsync(SelectedConversation);
             RefreshConversationsChanged.InvokeAsync(RefreshConversations);   
         }
+
+        MobileMessageViewFlag = true;
+        MobileMessageViewFlagChanged.InvokeAsync(MobileMessageViewFlag);
         StateHasChanged();
 
     }

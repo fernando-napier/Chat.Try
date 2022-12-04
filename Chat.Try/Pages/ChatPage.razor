@@ -13,50 +13,57 @@
 <AuthorizeView>
     <Authorized>
         <div class="messaging">
+            <button class="return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">return to convos</button>
             <div class="inbox_msg">
-            <div class="inbox_people">
+                <div class="inbox_people @((MobileMessageViewFlag ? "inbox_not_selected" : ""))">
                 <div class="headind_srch">
                 <div class="recent_heading">
                     <h4>Recent</h4>
                 </div>
                 <div class="srch_bar">
                     <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search for Users">
-                    @if(UserSearchResults != null && UserSearchResults.Any())
-                    {
-                        <ul class="list-group" style="position: absolute; z-index: 100;">
-                            @foreach(var userChosen in UserSearchResults)
+                            @if (UserSearchResults != null && UserSearchResults.Any())
                             {
-                                <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
+                                <ul class="list-group" style="position: absolute; z-index: 100;">
+                                    @foreach (var userChosen in UserSearchResults)
+                                    {
+                                        <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
+                                    }
+                                </ul>
                             }
-                        </ul>
-                    }
-                </div>
-                </div>
-                <div class="inbox_chat">
+                        </div>
+                    </div>
+                    <div class="inbox_chat">
                         @if (RefreshConversations != null)
                         {
                             Conversations = RefreshConversations;
                         }
-                    <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" @bind-RefreshConversations="RefreshConversations"/>
+                        <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" @bind-MobileMessageViewFlag="MobileMessageViewFlag"/>
+                    </div>
                 </div>
-            </div>
-                <div class="mesgs">
+                <div class="msgs @((MobileMessageViewFlag ? "msgs_selected" : ""))">
+                    @if(SelectedConversation != null)
+                    {
+                        var convo = Conversations.First(x => x.Id == SelectedConversation.Id);
+                        SelectedConversation = convo;
+                        MobileConvoUserString = SelectedConversation.ConversationUsers.First(x => x.UserId != _userId).User.UserName;
+                        <div class=" @((MobileMessageViewFlag ? "" : "hidden_stuff"))">@MobileConvoUserString</div>
+                    }
                     <div class="msg_history flex-column-reverse" @ref=MessageRef>
                         @if (SelectedConversation != null)
                         {
-                            var convo = Conversations.First(x => x.Id == SelectedConversation.Id);
-                            SelectedConversation = convo;
                             <DisplayMessages @ref=_displayMessages Conversation=@SelectedConversation UserId=@_userId />
                         }
                     </div>
+
                     <div class="type_msg">
-                    <div class="input_msg_write">
+                        <div class="input_msg_write">
                             <input type="text" class="write_msg" @onkeyup="SendMessageOnKeyPress" @bind=NewMessage placeholder="Type a message" />
-                        <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
+                            <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            </div>
+        </div>
         </div>
     </Authorized>
 
@@ -65,8 +72,10 @@
         <p>In order to interact with others Login or Register</p>
         <a href="#">Go Home</a>
     </NotAuthorized>
- 
+
 </AuthorizeView>
+
+
 
 @code{
     private List<string> UserSearchResults { get; set; }
@@ -84,6 +93,9 @@
     ElementReference MessageRef;
     private bool ScrollUpdatedFlag = false;
     private int ScrollCounter = 0;
+    private bool ReturnToConvos = false;
+    private bool MobileMessageViewFlag { get; set; } = false;
+    private string MobileConvoUserString { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,6 +112,11 @@
 
         Conversations = _chatAccessor.GetUserConversations(_userId);
         StateHasChanged();
+    }
+
+    private void FlipReturnToConvo()
+    {
+        MobileMessageViewFlag = false;
     }
 
     private async Task CreateUserConversation(string userChosen)
@@ -184,14 +201,42 @@
     }
 }
 
+
+
 <style>
-    .container {
-        max-width: 1170px;
-        margin: auto;
+
+    @@media screen and (max-width: 767px) {
+
+        .inbox_people {
+            width: 95%!important;
+        }
+
+        .msgs {
+            width: 0%!important;
+        }
+
+        .inbox_not_selected {
+            width: 0%!important;
+        }
+
+        .msgs_selected {
+            width: 95%!important;
+        }
+
+        .return_to_convo {
+            visibility: inherit;
+        }
+
+        .hidden_stuff {
+            visibility: hidden!important;
+        }
     }
 
-    img {
-        max-width: 100%;
+    @@media screen and (min-width: 768px) {
+
+        .return-to-convo {
+            visibility: hidden;
+        }
     }
 
     .inbox_people {
@@ -200,6 +245,22 @@
         overflow: hidden;
         width: 40%;
         border-right: 1px solid #c4c4c4;
+    }
+
+    .msgs {
+        float: left;
+        padding: 30px 15px 0 25px;
+        width: 60%;
+        display: grid;
+    }
+
+    .container {
+        max-width: 1170px;
+        margin: auto;
+    }
+
+    img {
+        max-width: 100%;
     }
 
     .inbox_msg {
@@ -338,13 +399,6 @@
 
     .received_withd_msg {
         width: 57%;
-    }
-
-    .mesgs {
-        float: left;
-        padding: 30px 15px 0 25px;
-        width: 60%;
-        display: grid;
     }
 
     .sent_withd_msg p {
