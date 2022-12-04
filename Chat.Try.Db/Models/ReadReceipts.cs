@@ -5,19 +5,13 @@ using System.Collections.Generic;
 
 namespace Chat.Try.Db.Models
 {
-    public partial class UserMessages
+    public partial class ReadReceipts
     {
-        public UserMessages()
-        {
-            ReadReceipts = new HashSet<ReadReceipts>();
-        }
-
         public int Id { get; set; }
+        public int UserMessageId { get; set; }
         public int ConversationUserId { get; set; }
-        public string Message { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
 
-        public virtual ConversationUsers ConversationUser { get; set; }
-        public virtual ICollection<ReadReceipts> ReadReceipts { get; set; }
+        public virtual UserMessages UserMessage { get; set; }
     }
 }

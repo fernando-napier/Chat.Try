@@ -6,6 +6,7 @@
         <li class="list-group-item disabled">Existing Convos</li>
         @foreach(var conversation in Conversations)
         {
+            var hasUnreadMessages = HasUnreadMessages(conversation);
             @foreach (var convoUser in conversation.ConversationUsers)
             {
                 @if (convoUser.UserId != UserId)
@@ -16,7 +17,7 @@
                     {
                         sentOrReceived = recentMessage.ConversationUser.UserId == UserId ? "Sent" : "Received";
                     }
-                    <div class="chat_list @SelectConversation(conversation)" @onclick="() => SetSelect(conversation)">
+                    <div class="chat_list @UnreadMessagesAlert(hasUnreadMessages) @SelectConversation(conversation, hasUnreadMessages)" @onclick="() => SetSelect(conversation)">
                         <div class="chat_people">
                             <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                             <div class="chat_ib">
@@ -39,6 +40,21 @@
     small {
         font-size: 10px;
     }
+
+    .blink-bg{
+		color: #fff;
+		padding: 10px;
+		display: inline-block;
+		border-radius: 5px;
+		animation: blinkingBackground 2s infinite;
+	}
+	@@keyframes blinkingBackground{
+		0%		{ background-color: #10c018;}
+		25%		{ background-color: #1056c0;}
+		50%		{ background-color: #10c018;}
+		75%		{ background-color: #1056c0;}
+		100%	{ background-color: #04a1d5;}
+	}
 </style>
 
 @code {
@@ -82,11 +98,11 @@
                         StateHasChanged();
                     }
                 });
-            }, null, 0, 5000);
+            }, null, 0, 3000);
         }
     }
 
-    private bool RefreshConvos()
+    private bool RefreshConvos(bool hardRefresh = false)
     {
         var refreshConversations = _chatAccessor.RefreshConversations(UserId);
         var refreshConversationsFlag = false;
@@ -101,7 +117,7 @@
                 refreshConversationsFlag = true;
             }
         }
-        if (refreshConversationsFlag)
+        if (refreshConversationsFlag || hardRefresh)
         {
             Conversations = refreshConversations;
             RefreshConversations = refreshConversations;
@@ -109,9 +125,27 @@
         return refreshConversationsFlag;
     }
 
-    private string SelectConversation(Conversations conversation) =>
-        IsSelected(conversation) ? "bg-info text-white" : "bg-light";
+    private string UnreadMessagesAlert(bool hasUnreadMessages)
+    {
+        return hasUnreadMessages ? "blink-bg" : string.Empty;
+    }
 
+    private bool HasUnreadMessages(Conversations convo)
+    {
+        var userMessages = convo.ConversationUsers.First(x => x.UserId != UserId).UserMessages;
+        return userMessages.Any() && userMessages.Any(x => !x.ReadReceipts.Any());
+
+    }
+
+    private string SelectConversation(Conversations conversation, bool hasUnreadMessages)
+    {
+        if (hasUnreadMessages)
+        {
+            return string.Empty;
+        }
+
+        return IsSelected(conversation) ? "bg-info text-white" : "bg-light";
+    }
 
     bool IsSelected(Conversations conversation)
     {
@@ -126,7 +160,9 @@
 
     void SetSelect(Conversations conversation)
     {
-        RefreshConvos();
+        _chatAccessor.SetConversationRead(conversation.Id,
+                conversation.ConversationUsers.First(x => x.UserId == UserId).Id);
+        RefreshConvos(true);
         if (IsSelected(conversation))
         {
             SelectedConversationChanged.InvokeAsync(SelectedConversation);
@@ -134,10 +170,11 @@
         }
         else
         {
-            SelectedConversation = conversation;
+            SelectedConversation = RefreshConversations.First(x => x.Id == conversation.Id);
             SelectedConversationChanged.InvokeAsync(SelectedConversation);
-            RefreshConversationsChanged.InvokeAsync(RefreshConversations);
-            StateHasChanged();
+            RefreshConversationsChanged.InvokeAsync(RefreshConversations);   
         }
+        StateHasChanged();
+
     }
 }
