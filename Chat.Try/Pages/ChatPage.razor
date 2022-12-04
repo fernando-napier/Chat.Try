@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div class="msgs @((MobileMessageViewFlag ? "msgs_selected" : ""))">
-                    @if(SelectedConversation != null)
+                    @if(SelectedConversation != null && SelectedConversation.Id != 0)
                     {
                         var convo = Conversations.First(x => x.Id == SelectedConversation.Id);
                         SelectedConversation = convo;
@@ -50,13 +50,13 @@
                         <div class=" @((MobileMessageViewFlag ? "" : "hidden_stuff"))">@MobileConvoUserString</div>
                     }
                     <div class="msg_history flex-column-reverse" @ref=MessageRef>
-                        @if (SelectedConversation != null)
+                        @if (SelectedConversation != null && SelectedConversation.Id != 0)
                         {
                             <DisplayMessages @ref=_displayMessages Conversation=@SelectedConversation UserId=@_userId />
                         }
                     </div>
 
-                    <div class="type_msg">
+                    <div class="type_msg @((MobileMessageViewFlag ? "" : "hidden_stuff"))">
                         <div class="input_msg_write">
                             <input type="text" class="write_msg" @onkeyup="SendMessageOnKeyPress" @bind=NewMessage placeholder="Type a message" />
                             <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
@@ -117,6 +117,7 @@
     private void FlipReturnToConvo()
     {
         MobileMessageViewFlag = false;
+        SelectedConversation = new Conversations();
     }
 
     private async Task CreateUserConversation(string userChosen)
@@ -229,6 +230,7 @@
 
         .hidden_stuff {
             visibility: hidden!important;
+            display:none;
         }
     }
 

@@ -171,6 +171,7 @@
         RefreshConvos(true);
         if (IsSelected(conversation))
         {
+            SelectedConversation = new Conversations();
             SelectedConversationChanged.InvokeAsync(SelectedConversation);
             RefreshConversationsChanged.InvokeAsync(RefreshConversations);
         }
