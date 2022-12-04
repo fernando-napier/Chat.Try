@@ -14,8 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\1.AddCounterUserUniqueIndex.sql" />
-    <EmbeddedResource Include="Scripts\2.AddForeignKeyCounterToUser.sql" />
+    <EmbeddedResource Include="Scripts\*" />
   </ItemGroup>
 
   <ItemGroup>
