@@ -23,6 +23,7 @@ namespace Chat.Try.Db.Context
         public virtual DbSet<ConversationUsers> ConversationUsers { get; set; }
         public virtual DbSet<Conversations> Conversations { get; set; }
         public virtual DbSet<Counter> Counter { get; set; }
+        public virtual DbSet<ReadReceipts> ReadReceipts { get; set; }
         public virtual DbSet<UserMessages> UserMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -84,6 +85,17 @@ namespace Chat.Try.Db.Context
                     .HasForeignKey<Counter>(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Counter_On_User");
+            });
+
+            modelBuilder.Entity<ReadReceipts>(entity =>
+            {
+                entity.ToTable("ReadReceipts", "chat");
+
+                entity.HasOne(d => d.UserMessage)
+                    .WithMany(p => p.ReadReceipts)
+                    .HasForeignKey(d => d.UserMessageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ReadReceipts_On_UserMessages");
             });
 
             modelBuilder.Entity<UserMessages>(entity =>

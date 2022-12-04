@@ -27,6 +27,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[chat].[ReadReceipts]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[chat].[UserMessages]",
          "ObjectType": 0
       },

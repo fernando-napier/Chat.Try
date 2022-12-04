@@ -18,6 +18,8 @@ namespace Chat.Try.Accessors
         bool SaveCounter(Counter counter);
         bool UpdateCounter(Counter counter);
         List<Counter> GetLeaderboard();
+
+        void SetConversationRead(int conversationId, int conversationUserId);
     }
 
     public class ChatDbAccessor : IChatDbAccessor
@@ -36,7 +38,7 @@ namespace Chat.Try.Accessors
             var conversationIds = _chatContext.ConversationUsers.AsNoTracking().Where(x => x.UserId == userId).Select(x => x.ConversationId);
             return _chatContext.Conversations.AsNoTracking().Where(x => conversationIds.Contains(x.Id))
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
-                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages).ThenInclude(x => x.ReadReceipts)
                 .OrderByDescending(x => x.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(y => y.CreatedOn).FirstOrDefault())
                 .ToList();
         }
@@ -72,7 +74,7 @@ namespace Chat.Try.Accessors
         {
             return _chatContext.Conversations.AsNoTracking()
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
-                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages).ThenInclude(x => x.ReadReceipts)
                 .First(x => x.Id == conversationId)
                 .ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(x => x.CreatedOn).ToList();
         }
@@ -81,7 +83,7 @@ namespace Chat.Try.Accessors
         {
             return _chatContext.Conversations.AsNoTracking()
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
-                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages).ThenInclude(x => x.ReadReceipts)
                 .First(x => x.Id == id);
         }
 
@@ -90,7 +92,7 @@ namespace Chat.Try.Accessors
             var conversationIds = _chatContext.ConversationUsers.AsNoTracking().Where(x => x.UserId == userId).Select(x => x.ConversationId);
             return _chatContext.Conversations.AsNoTracking().Where(x => conversationIds.Contains(x.Id))
                 .Include(x => x.ConversationUsers).ThenInclude(x => x.User)
-                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages)
+                .Include(x => x.ConversationUsers).ThenInclude(x => x.UserMessages).ThenInclude(x => x.ReadReceipts)
                 .OrderByDescending(x => x.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(y => y.CreatedOn).FirstOrDefault())
                 .ToList();
         }
@@ -117,6 +119,33 @@ namespace Chat.Try.Accessors
         {
             _chatContext.Counter.Update(counter);
             return _chatContext.SaveChanges() > 0;
+        }
+
+        public void SetConversationRead(int conversationId, int conversationUserId)
+        {
+            using var scope = _serviceScope.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ChatContext>();
+
+            var conversation = context.Conversations
+                .Include(x => x.ConversationUsers)
+                .ThenInclude(x => x.UserMessages)
+                .ThenInclude(x => x.ReadReceipts)
+                .First(x => x.Id == conversationId);
+            var unreadMessages = conversation.ConversationUsers.First(x => x.Id != conversationUserId)
+                .UserMessages.Where(x => !x.ReadReceipts.Any()).ToList();
+
+            var readReceipts = unreadMessages.Select(x => 
+                new ReadReceipts
+                {
+                    UserMessageId = x.Id,
+                    ConversationUserId = x.ConversationUser.Id,
+                    CreatedOn = DateTimeOffset.Now,
+                });
+
+            context.AddRange(readReceipts);
+            context.SaveChanges();
+
+
         }
     }
 }
