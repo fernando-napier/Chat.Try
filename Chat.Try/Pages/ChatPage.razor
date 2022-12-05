@@ -41,7 +41,7 @@
                         <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" @bind-MobileMessageViewFlag="MobileMessageViewFlag"/>
                     </div>
                 </div>
-                <div class="msgs @((MobileMessageViewFlag ? "msgs_selected" : ""))">
+                <div class="msgs @((MobileMessageViewFlag ? "msgs_selected" : "hidden_stuff"))">
                     @if(SelectedConversation != null && SelectedConversation.Id != 0)
                     {
                         var convo = Conversations.First(x => x.Id == SelectedConversation.Id);
@@ -58,7 +58,7 @@
 
                     <div class="type_msg @((MobileMessageViewFlag ? "" : "hidden_stuff"))">
                         <div class="input_msg_write">
-                            <input type="text" class="write_msg" @onkeyup="SendMessageOnKeyPress" @bind=NewMessage placeholder="Type a message" />
+                            <textarea type="text" class="write_msg" @onkeyup="SendMessageOnKeyPress" @bind=NewMessage placeholder="Type a message" />
                             <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
                         </div>
                     </div>
@@ -230,7 +230,7 @@
 
         .hidden_stuff {
             visibility: hidden!important;
-            display:none;
+            display:none!important;
         }
     }
 
@@ -239,6 +239,10 @@
         .return-to-convo {
             visibility: hidden;
         }
+    }
+
+    textarea {
+        width: 85%;
     }
 
     .inbox_people {
@@ -453,8 +457,9 @@
         height: 33px;
         position: absolute;
         right: 0;
-        top: 11px;
+        top: 5px;
         width: 33px;
+        margin-right: 5px;
     }
 
     .messaging {
