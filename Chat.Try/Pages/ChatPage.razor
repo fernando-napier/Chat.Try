@@ -13,10 +13,9 @@
 <AuthorizeView>
     <Authorized>
         <div class="messaging">
-            <button class="return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">return to convos</button>
             <div class="inbox_msg">
                 <div class="inbox_people @((MobileMessageViewFlag ? "inbox_not_selected" : ""))">
-                <div class="headind_srch">
+                    <div class="headind_srch @((MobileMessageViewFlag ? "hidden_stuff" : ""))">
                 <div class="recent_heading">
                     <h4>Recent</h4>
                 </div>
@@ -33,7 +32,7 @@
                             }
                         </div>
                     </div>
-                    <div class="inbox_chat">
+                    <div class="inbox_chat @((MobileMessageViewFlag ? "hidden_stuff" : ""))">
                         @if (RefreshConversations != null)
                         {
                             Conversations = RefreshConversations;
@@ -47,7 +46,11 @@
                         var convo = Conversations.First(x => x.Id == SelectedConversation.Id);
                         SelectedConversation = convo;
                         MobileConvoUserString = SelectedConversation.ConversationUsers.First(x => x.UserId != _userId).User.UserName;
-                        <div class=" @((MobileMessageViewFlag ? "" : "hidden_stuff"))">@MobileConvoUserString</div>
+                        <div class="float-parent-element">
+                            <div class="float-child-element  @((MobileMessageViewFlag ? "" : "hidden_stuff"))"><strong>@MobileConvoUserString</strong></div>
+                            <button class="float-child-element return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">back</button>
+                        </div>
+                        
                     }
                     <div class="msg_history flex-column-reverse" @ref=MessageRef>
                         @if (SelectedConversation != null && SelectedConversation.Id != 0)
@@ -209,7 +212,7 @@
     @@media screen and (max-width: 767px) {
 
         .inbox_people {
-            width: 95%!important;
+            width: 100%!important;
         }
 
         .msgs {
@@ -221,11 +224,13 @@
         }
 
         .msgs_selected {
-            width: 95%!important;
+            width: 100%!important;
         }
 
         .return_to_convo {
-            visibility: inherit;
+            visibility: inherit!important;
+            float: right;
+            width: 20%
         }
 
         .hidden_stuff {
@@ -237,8 +242,18 @@
     @@media screen and (min-width: 768px) {
 
         .return-to-convo {
-            visibility: hidden;
+            visibility: hidden!important;
+            display: none!important;
         }
+    }
+
+    .float-parent-element {
+        width: 50%;
+    }
+
+    .float-child-element {
+        float: left;
+        width: 50%;
     }
 
     textarea {
