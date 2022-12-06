@@ -47,8 +47,8 @@
                         SelectedConversation = convo;
                         MobileConvoUserString = SelectedConversation.ConversationUsers.First(x => x.UserId != _userId).User.UserName;
                         <div class="float-parent-element">
-                            <div class="float-child-element  @((MobileMessageViewFlag ? "" : "hidden_stuff"))"><strong>@MobileConvoUserString</strong></div>
-                            <button class="float-child-element return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">back</button>
+                            <div class="float-child-element-right  @((MobileMessageViewFlag ? "" : "hidden_stuff"))"><strong>@MobileConvoUserString</strong></div>
+                            <button class="float-child-element-left return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">&lt;=</button>
                         </div>
                         
                     }
@@ -99,6 +99,7 @@
     private bool ReturnToConvos = false;
     private bool MobileMessageViewFlag { get; set; } = false;
     private string MobileConvoUserString { get; set; } = string.Empty;
+    private Timer Timer { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -248,12 +249,18 @@
     }
 
     .float-parent-element {
-        width: 50%;
+        width: 100%;
+        display: inline-block;
     }
 
-    .float-child-element {
+    .float-child-element-right {
+        float: right;
+        width: 80%!important;
+    }
+
+    .float-child-element-left {
         float: left;
-        width: 50%;
+        width: 35px!important;
     }
 
     textarea {
