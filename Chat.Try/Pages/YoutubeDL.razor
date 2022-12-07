@@ -1,0 +1,155 @@
+﻿@page "/youtube"
+@using System.Diagnostics;
+@using System.Text;
+@using Blazor.DownloadFileFast.Interfaces;
+@using System.Text.RegularExpressions;
+@inject IJSRuntime JsRuntime
+
+<h2>YoutubeDL</h2>
+<p>This is an experimental page where I allow users to download mp4s of youtube videos.</p>
+<hr />
+
+<div class="float-parent-element">
+    <input disabled=@IsDownloadActive @bind=Url type="text" class="yt-float-child-element-left search-bar" placeholder="https://www.youtube.com/">
+    <button disabled=@IsDownloadActive class="yt-float-child-element-right" @onclick="DownloadVideo">Download</button>
+</div>
+<div class="yt-float-child-element-left">
+    <input disabled=@IsDownloadActive id="checkbox" type="checkbox" @bind="mp3Flag" />
+    <label for="checkbox">Audio Only?</label>
+</div>
+<br />
+@if (DownloadProgress.Any())
+{
+    <div class="yt-float-parent-element  progress-update">
+        @for (int i = DownloadProgress.Count - 1; i >= 0; i--)
+        {
+            <p>@DownloadProgress.ElementAt(i)</p>
+        }
+    </div>
+}
+@if (DownloadComplete)
+{
+    <div class="yt-float-parent-element progress-complete">
+        <p>Processing is complete! Now downloading to your browser. </p>
+    </div>
+}
+
+<style>
+
+    .progress-complete {
+        margin-top: 20px;
+    }
+
+    .progress-update {
+        margin-top: 20px;
+        height: 300px;
+        overflow: auto;
+        display: flex!important;
+        flex-direction: column-reverse;
+    }
+    .yt-float-parent-element {
+        width: 80%;
+        display: inline-block;
+    }
+
+    .yt-float-child-element-left  {
+        float: left;
+        width: 70%;
+    }
+
+    .yt-float-child-element-right {
+        float: right;
+        width: 20%;
+    }
+    
+</style>
+
+@code {
+    [Inject]
+    public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+
+    private bool mp3Flag { get; set; }
+    private bool DownloadComplete = false;
+    private bool IsDownloadActive = false;
+    private string Url { get; set; }
+    private List<string> DownloadProgress = new List<string>();
+    private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
+
+    private async Task DownloadVideo()
+    {
+
+        IsDownloadActive = true;
+        DownloadComplete = false;
+        DownloadProgress = new List<string>();
+        StateHasChanged();
+        var filename = mp3Flag ? $"{Guid.NewGuid()}.mp3" : $"{Guid.NewGuid()}.mp4";
+
+
+        if (string.IsNullOrEmpty(Url) || !regex.IsMatch(Url))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Not a valid youtube url!");
+            return;
+        }
+
+        try
+        {
+            var lineCount = 0;
+            var name = "download.mp4";
+            var args = new StringBuilder();
+            args.Append($"/C youtube-dl.exe -o {filename} --max-filesize 10.0m {Url} ");
+            if (mp3Flag)
+            {
+                args.Append(" -x --audio-format mp3");
+                name = "download.mp3";
+            }
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = args.ToString();
+            startInfo.RedirectStandardOutput = true;
+            process.StartInfo = startInfo;
+            process.ErrorDataReceived += new DataReceivedEventHandler(async (sender, e) =>
+            {
+                // Prepend line numbers to each line of the output.
+                if (!String.IsNullOrEmpty(e.Data))
+                {
+                    lineCount++;
+                    DownloadProgress.Add(e.Data);
+                }
+                await InvokeAsync(() =>
+                 {
+                     StateHasChanged();
+                 });
+            });
+            process.OutputDataReceived += new DataReceivedEventHandler(async (sender, e) =>
+            {
+                // Prepend line numbers to each line of the output.
+                if (!String.IsNullOrEmpty(e.Data))
+                {
+                    lineCount++;
+                    DownloadProgress.Add(e.Data);
+                }
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+            });
+            process.Start();
+            process.BeginOutputReadLine();
+
+            await process.WaitForExitAsync();
+            await BlazorDownloadFileService.DownloadFileAsync(name, File.ReadAllBytes(filename));
+            File.Delete(filename);
+            DownloadComplete = true;
+        }
+        catch (Exception ex)
+        {
+            File.Delete(filename);
+            await JsRuntime.InvokeVoidAsync("alert", "Youtube download failed, try again.");
+        }
+
+        IsDownloadActive = false;
+        StateHasChanged();
+    }
+}

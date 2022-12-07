@@ -39,6 +39,7 @@ builder.Services.AddResponseCompression(opts =>
 {
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 });
+builder.Services.AddBlazorDownloadFile();
 
 var app = builder.Build();
 
