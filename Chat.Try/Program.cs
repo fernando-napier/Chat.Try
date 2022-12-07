@@ -3,6 +3,7 @@ using Chat.Try.Accessors;
 using Chat.Try.Areas.Identity;
 using Chat.Try.Data;
 using Chat.Try.Db.Context;
+using Chat.Try.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +12,16 @@ using Microsoft.EntityFrameworkCore;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<Configuration>(opt =>
+{
+    return new Configuration
+    {
+        YoutubeDLPath = builder.Configuration.GetValue<string>("YoutubeDLPath"),
+    };
+});
+
+    
 
 // Add services to the container.
 builder.Services.AddScoped<IUserDbAccessor, UserDbAccessor>();
