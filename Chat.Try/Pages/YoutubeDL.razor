@@ -60,7 +60,7 @@
 
     .yt-float-child-element-right {
         float: right;
-        width: 20%;
+        width: 100px;
     }
     
 </style>
@@ -150,7 +150,8 @@
         catch (Exception ex)
         {
             File.Delete(filename);
-            await JsRuntime.InvokeVoidAsync("alert", "Youtube download failed, try again.");
+            await JsRuntime.InvokeVoidAsync("alert", $"Youtube download failed, try again. {ex.Message}");
+            DownloadProgress.Add(ex.Message);
         }
 
         IsDownloadActive = false;
