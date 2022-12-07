@@ -1,0 +1,92 @@
+﻿@page "/beautify"
+@using System.Diagnostics;
+@using System.Text;
+@using Blazor.DownloadFileFast.Interfaces;
+@using System.Text.RegularExpressions;
+@using Chat.Try.Models;
+@using YoutubeDLSharp;
+@using YoutubeDLSharp.Options;
+@inject IJSRuntime JsRuntime
+
+
+<h2>Format Beautifier</h2>
+<p>This is an experimental page where XML or JSON is passed through and beautified.</p>
+<hr />
+
+
+<div class="row align-items-center">
+    <div class="col-12 col-md-9 col-lg-8">
+        <textarea disabled=@IsBeautifyActive @bind=PlainString type="text" class="text-area" placeholder="{}" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-3 col-md-3">
+        <div class="custom-select" style="width:100px; margin-bottom:3px;">
+            <select class="form-select" id="format" @bind=SelectedFormat>
+                <option value="1">JSON</option>
+                <option value="2">XML</option>
+            </select>
+            @*<button disabled=@IsBeautifyActive class="yt-float-child-element-right bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>*@
+        </div>
+    </div>
+    <div class="col-3 col-md-3 offset-5 offset-md-3 ">
+        <button disabled=@IsBeautifyActive class="yt-float-child-element-right bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>
+    </div>
+</div>
+
+
+
+<style>
+
+    .text-area {
+        resize: vertical;
+        height: 316px;
+        min-height: 316px;
+        overflow-y: scroll;
+        width:100%;
+    }
+
+    .float-parent-element {
+        width: 100%;
+        display: block;
+    }
+
+    .float-child-element-left {
+        float: left;
+        width: 50%!important;
+    }
+
+    .float-child-element-right {
+        margin-left:10px;
+        float: left;
+        width: 35px!important;
+    }
+
+
+</style>
+
+@code {
+    public string PlainString { get; set; }
+    public string SelectedFormat { get; set; }
+    private bool BeautificationComplete = false;
+    private bool IsBeautifyActive = false;
+
+    private async Task BeautifyString()
+    {
+
+        IsBeautifyActive = true;
+        BeautificationComplete = false;
+        StateHasChanged();
+       
+        if (string.IsNullOrEmpty(PlainString))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Enter data");
+            return;
+        }
+
+
+        BeautificationComplete = true;
+        IsBeautifyActive = false;
+        StateHasChanged();
+    }
+}

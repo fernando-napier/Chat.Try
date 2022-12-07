@@ -12,14 +12,19 @@
 <p>This is an experimental page where I allow users to download mp4s of youtube videos.</p>
 <hr />
 
-<div class="float-parent-element">
-    <input disabled=@IsDownloadActive @bind=Url type="text" class="yt-float-child-element-left search-bar" placeholder="https://www.youtube.com/">
-    <button disabled=@IsDownloadActive class="yt-float-child-element-right" @onclick="DownloadVideo">Download</button>
+<div class="row">
+    <div class="col-12 col-md-9" style="margin-bottom: 5px;">
+        <input disabled=@IsDownloadActive @bind=Url type="text" style="width: 100%;" placeholder="https://www.youtube.com/">  
+    </div>
+    <div class="col-2 col-md-3">
+        <button disabled=@IsDownloadActive @onclick="DownloadVideo">Download</button>
+    </div>
+    <div class="col-5 offset-5 offset-md-0">
+        <input disabled=@IsDownloadActive id="checkbox" type="checkbox" @bind="mp3Flag" />
+        <label for="checkbox">Audio Only?</label>
+    </div>
 </div>
-<div class="yt-float-child-element-left">
-    <input disabled=@IsDownloadActive id="checkbox" type="checkbox" @bind="mp3Flag" />
-    <label for="checkbox">Audio Only?</label>
-</div>
+
 <br />
 @if (DownloadProgress.Any())
 {
@@ -94,8 +99,13 @@
         if (string.IsNullOrEmpty(Url) || !regex.IsMatch(Url))
         {
             await JsRuntime.InvokeVoidAsync("alert", "Not a valid youtube url!");
+            IsDownloadActive = false;
+            StateHasChanged();
             return;
         }
+
+        DownloadProgress.Add("Setting up process...");
+        StateHasChanged();
 
         try
         {
