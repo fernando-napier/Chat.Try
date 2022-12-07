@@ -100,6 +100,8 @@
         try
         {
             var ytdlProc = new YoutubeDLProcess();
+            ytdlProc.PythonPath = Config.PythonPath;
+            ytdlProc.ExecutablePath = Config.YoutubeDLPath;
             // capture the standard output and error output
             ytdlProc.OutputReceived += async (o, e) =>
             {

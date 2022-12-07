@@ -17,6 +17,7 @@ builder.Services.AddScoped<Configuration>(opt =>
 {
     return new Configuration
     {
+        PythonPath = builder.Configuration.GetValue<string>("PythonPath"),
         YoutubeDLPath = builder.Configuration.GetValue<string>("YoutubeDLPath"),
     };
 });
