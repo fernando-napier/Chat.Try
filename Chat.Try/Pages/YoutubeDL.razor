@@ -149,9 +149,9 @@
         }
         catch (Exception ex)
         {
-            File.Delete(filename);
             await JsRuntime.InvokeVoidAsync("alert", $"Youtube download failed, try again. {ex.Message}");
             DownloadProgress.Add(ex.Message);
+            File.Delete(filename);
         }
 
         IsDownloadActive = false;
