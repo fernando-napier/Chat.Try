@@ -28,17 +28,21 @@
 <br />
 @if (DownloadProgress.Any())
 {
-    <div class="yt-float-parent-element  progress-update">
-        @for (int i = DownloadProgress.Count - 1; i >= 0; i--)
-        {
-            <p>@DownloadProgress.ElementAt(i)</p>
-        }
+    <div class="row">
+        <div class="col-12 col-md-6 bg-secondary progress-update">
+            @for (int i = DownloadProgress.Count - 1; i >= 0; i--)
+            {
+                <p>@DownloadProgress.ElementAt(i)</p>
+            }
+        </div>
     </div>
 }
 @if (DownloadComplete)
 {
-    <div class="yt-float-parent-element progress-complete">
-        <p>Processing is complete! Now downloading to your browser. </p>
+    <div class="row">
+        <div class="col-12 col-md-6 bg-success  progress-complete">
+            <p>Processing is complete! Now downloading to your browser. </p>
+        </div>
     </div>
 }
 
