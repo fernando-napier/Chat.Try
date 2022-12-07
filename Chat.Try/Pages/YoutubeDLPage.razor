@@ -4,6 +4,8 @@
 @using Blazor.DownloadFileFast.Interfaces;
 @using System.Text.RegularExpressions;
 @using Chat.Try.Models;
+@using YoutubeDLSharp;
+@using YoutubeDLSharp.Options;
 @inject IJSRuntime JsRuntime
 
 <h2>YoutubeDL</h2>
@@ -97,53 +99,49 @@
 
         try
         {
-            var lineCount = 0;
-            var name = "download.mp4";
-            var args = new StringBuilder();
-            args.Append($"/C {Config.YoutubeDLPath} -o {filename} --max-filesize 10.0m {Url} ");
-            if (mp3Flag)
+            var ytdlProc = new YoutubeDLProcess();
+            // capture the standard output and error output
+            ytdlProc.OutputReceived += async (o, e) =>
             {
-                args.Append(" -x --audio-format mp3");
-                name = "download.mp3";
-            }
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = args.ToString();
-            startInfo.RedirectStandardOutput = true;
-            process.StartInfo = startInfo;
-            process.ErrorDataReceived += new DataReceivedEventHandler(async (sender, e) =>
-            {
-                // Prepend line numbers to each line of the output.
                 if (!String.IsNullOrEmpty(e.Data))
                 {
-                    lineCount++;
-                    DownloadProgress.Add(e.Data);
-                }
-                await InvokeAsync(() =>
-                 {
-                     StateHasChanged();
-                 });
-            });
-            process.OutputDataReceived += new DataReceivedEventHandler(async (sender, e) =>
-            {
-                // Prepend line numbers to each line of the output.
-                if (!String.IsNullOrEmpty(e.Data))
-                {
-                    lineCount++;
-                    DownloadProgress.Add(e.Data);
+                    var data = e.Data.Replace("[download]", "[Processing]");
+                    DownloadProgress.Add(data);
                 }
                 await InvokeAsync(() =>
                 {
                     StateHasChanged();
                 });
-            });
-            process.Start();
-            process.BeginOutputReadLine();
+            };
+            ytdlProc.ErrorReceived += async (o, e) => 
+            {
+                if (!String.IsNullOrEmpty(e.Data))
+                {
+                    var data = e.Data.Replace("[download]", "[Processing]");
+                    DownloadProgress.Add($"ERROR: {data}");
+                }
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+            };
+            var options = new OptionSet()
+                {
+                    Output = filename,
+                    MaxFilesize = "10.0m",
+                };
 
-            await process.WaitForExitAsync();
-            await BlazorDownloadFileService.DownloadFileAsync(name, File.ReadAllBytes(filename));
+            if (mp3Flag)
+            {
+                options.ExtractAudio = mp3Flag;
+                options.AudioFormat = AudioConversionFormat.Mp3;
+            }
+            
+            // start running
+            string[] urls = new[] { Url };
+            await ytdlProc.RunAsync(urls, options);
+
+            await BlazorDownloadFileService.DownloadFileAsync(mp3Flag ? "download.mp3" : "download.mp4", File.ReadAllBytes(filename));
             File.Delete(filename);
             DownloadComplete = true;
         }
