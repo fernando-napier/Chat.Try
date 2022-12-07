@@ -3,6 +3,7 @@
 @using System.Text;
 @using Blazor.DownloadFileFast.Interfaces;
 @using System.Text.RegularExpressions;
+@using Chat.Try.Models;
 @inject IJSRuntime JsRuntime
 
 <h2>YoutubeDL</h2>
@@ -68,6 +69,9 @@
     [Inject]
     public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
+    [Inject]
+    public Configuration Config { get; set; }
+
     private bool mp3Flag { get; set; }
     private bool DownloadComplete = false;
     private bool IsDownloadActive = false;
@@ -96,7 +100,7 @@
             var lineCount = 0;
             var name = "download.mp4";
             var args = new StringBuilder();
-            args.Append($"/C youtube-dl.exe -o {filename} --max-filesize 10.0m {Url} ");
+            args.Append($"/C {Config.YoutubeDLPath} -o {filename} --max-filesize 10.0m {Url} ");
             if (mp3Flag)
             {
                 args.Append(" -x --audio-format mp3");
