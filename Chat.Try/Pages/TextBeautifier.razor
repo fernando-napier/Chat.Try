@@ -27,7 +27,7 @@
 <div class="row">
     <div class="col-3 col-md-3">
         <div class="custom-select" style="width:100px; margin-bottom:3px;">
-            <select class="form-select" id="format" @bind=SelectedFormat>
+            <select class="form-select fixed-height" id="format" @bind=SelectedFormat>
                 <option value="0">Format</option>
                 <option value="json" >JSON</option>
                 <option value="xml">XML</option>
@@ -35,8 +35,8 @@
             @*<button disabled=@IsBeautifyActive class="yt-float-child-element-right bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>*@
         </div>
     </div>
-    <div class="col-3 col-md-3 offset-5 offset-md-3 ">
-        <button disabled=@IsBeautifyActive class="yt-float-child-element-right bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>
+    <div  class="col-3 col-md-3 offset-5 offset-md-3">
+        <button disabled=@IsBeautifyActive class="fixed-height bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>
     </div>
 </div>
 
@@ -64,10 +64,13 @@
 
 <style>
 
+    .fixed-height {
+        height: 39px;
+    }
     .text-area {
         resize: vertical;
-        height: 316px;
-        min-height: 316px;
+        height: 300px;
+        min-height: 300px;
         overflow-y: scroll;
         width:100%;
     }
@@ -139,6 +142,8 @@
 
         IsBeautifyActive = false;
         StateHasChanged();
+        await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
     }
 
     private void PrettyXml()

@@ -13,3 +13,8 @@ window.clipboardCopy = {
             });
     }
 };
+
+function scrollWindowToBottom() {
+    var height = document.body.scrollHeight;
+    window.scrollTo(0, height);
+}
