@@ -37,7 +37,7 @@
                         {
                             Conversations = RefreshConversations;
                         }
-                        <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" @bind-MobileMessageViewFlag="MobileMessageViewFlag"/>
+                        <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" @bind-MobileMessageViewFlag="MobileMessageViewFlag" @bind-RefreshConversations="RefreshConversations"/>
                     </div>
                 </div>
                 <div class="msgs @((MobileMessageViewFlag ? "msgs_selected" : "hidden_stuff"))">
@@ -168,6 +168,7 @@
         if (!string.IsNullOrWhiteSpace(UserSearch))
         {
             var existingUserConvos = Conversations.SelectMany(x => x.ConversationUsers).Select(x => x.User.UserName).Distinct().ToList();
+            existingUserConvos.Add(_username);
             UserSearchResults = _userDbAccessor.SearchForUsers(UserSearch, existingUserConvos);
             StateHasChanged();
         }        
@@ -181,9 +182,14 @@
         }
     }
 
-    private void SendMessage()
+    private async Task SendMessage()
     {
-        if (!string.IsNullOrEmpty(NewMessage))
+        if (SelectedConversation == null || SelectedConversation.Id == 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Choose a conversation to send messages!");
+            return;
+        }
+        else if (!string.IsNullOrEmpty(NewMessage))
         {
             var newMessage = new DisplayMessage()
                 {
@@ -196,6 +202,7 @@
             NewMessage = null;
 
             _displayMessages.RefreshMe();
+            Conversations = _chatAccessor.GetUserConversations(_userId);
             StateHasChanged();
             //await HubConnection.SendAsync("SendUserMessage", UserId, messageInput);
         }
