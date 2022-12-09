@@ -203,6 +203,7 @@
 
             _displayMessages.RefreshMe();
             Conversations = _chatAccessor.GetUserConversations(_userId);
+            RefreshConversations = Conversations;
             StateHasChanged();
             //await HubConnection.SendAsync("SendUserMessage", UserId, messageInput);
         }
