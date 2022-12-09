@@ -8,20 +8,28 @@
 @using YoutubeDLSharp.Options;
 @inject IJSRuntime JsRuntime
 
-<h2>YoutubeDL</h2>
-<p>This is an experimental page where I allow users to download mp4s of youtube videos.</p>
-<hr />
 
-<div class="row">
-    <div class="col-12 col-md-9 col-lg-6" style="margin-bottom: 5px;">
-        <input disabled=@IsDownloadActive @bind=Url type="text" style="width: 100%;" placeholder="https://www.youtube.com/">  
+<div class="container">
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <h2>YoutubeDL</h2>
+            <p>This is an experimental page where I allow users to download mp4s of youtube videos.</p>
+            <hr />
+        </div>
     </div>
-    <div class="col-2 col-md-3">
-        <button disabled=@IsDownloadActive @onclick="DownloadVideo">Download</button>
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8" style="margin-bottom: 5px;">
+            <input disabled=@IsDownloadActive @bind=Url type="text" style="width: 100%;" placeholder="https://www.youtube.com/">  
+        </div>
     </div>
-    <div class="col-5 offset-5 offset-md-0" style="display: flex; align-items:center">
-        <input disabled=@IsDownloadActive id="checkbox" style="margin-right:3px;" type="checkbox" @bind="mp3Flag" />
-        <label for="checkbox">Audio Only?</label>
+    <div class="row center-stuff">
+        <div class="col-5 col-md-3">
+            <input disabled=@IsDownloadActive id="checkbox" style="margin-right:3px;" type="checkbox" @bind="mp3Flag" />
+            <label for="checkbox">Audio Only?</label>
+        </div>
+        <div class="col-3 col-md-3 offset-4 offset-md-0">
+            <button class="float-right" disabled=@IsDownloadActive @onclick="DownloadVideo">Download</button>
+        </div>
     </div>
 </div>
 
@@ -47,6 +55,19 @@
 }
 
 <style>
+    .float-right {
+        float: right;
+    }
+
+    .center-stuff {
+        justify-content: space-evenly;
+        align-content: space-evenly;
+    }
+
+    .container {
+        justify-content: space-evenly;
+        align-content: space-evenly;
+    }
 
     .progress-complete {
         margin-top: 20px;

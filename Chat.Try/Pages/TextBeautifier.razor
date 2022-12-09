@@ -14,41 +14,47 @@
 @inject IJSRuntime JsRuntime
 
 
-<h2>Format Beautifier</h2>
-<p>This is an experimental page where XML or JSON is passed through and beautified.</p>
-<hr />
-
-
-<div class="row align-items-center">
-    <div class="col-12 col-md-9 col-lg-8">
-        <textarea disabled=@IsBeautifyActive @bind=PlainString type="text" class="text-area" placeholder="{}" />
-    </div>
-</div>
-<div class="row">
-    <div class="col-3 col-md-3">
-        <div class="custom-select" style="width:100px; margin-bottom:3px;">
-            <select class="form-select fixed-height" id="format" @bind=SelectedFormat>
-                <option value="0">Format</option>
-                <option value="json" >JSON</option>
-                <option value="xml">XML</option>
-            </select>
-            @*<button disabled=@IsBeautifyActive class="yt-float-child-element-right bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>*@
+<div class="container">
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <h2>Format Beautifier</h2>
+            <p>This is an experimental page where XML or JSON is passed through and beautified.</p>
+            <hr />
         </div>
     </div>
-    <div  class="col-3 col-md-3 offset-5 offset-md-3">
-        <button disabled=@IsBeautifyActive class="fixed-height bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>
-    </div>
-</div>
 
-@if (!string.IsNullOrEmpty(PrettyJson))
-{
-    <div class="row" style="margin-top:15px;">
-        <div class="col-12 col-md-9 col-lg-8">
-            <textarea disabled=true type="text" class="text-area" placeholder="@PrettyJson" />
-            <button class="@(CopySuccess ? "bg-info": "")" @onclick="CopyContents">Copy To Clipboard</button>
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <textarea disabled=@IsBeautifyActive @bind=PlainString type="text" class="text-area" placeholder="{}" />
         </div>
     </div>
-}
+    <div class="row center-stuff">
+        <div class="col-3 col-md-3">
+            <div class="custom-select" style="width:100px; margin-bottom:3px;">
+                <select class="form-select fixed-height" id="format" @bind=SelectedFormat>
+                    <option value="0">Format</option>
+                    <option value="json">JSON</option>
+                    <option value="xml">XML</option>
+                </select>
+                @*<button disabled=@IsBeautifyActive class="yt-float-child-element-right bg-info" style="width:100px;" @onclick="BeautifyString">Beautify</button>*@
+            </div>
+        </div>
+        <div class="col-3 col-md-3 offset-6 offset-md-0">
+            <button disabled=@IsBeautifyActive class="fixed-height bg-info float-right" style="width:100px;" @onclick="BeautifyString">Beautify</button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(PrettyJson))
+    {
+        <div class="row center-stuff" style="margin-top:15px;">
+            <div class="col-12 col-md-8">
+                <textarea disabled=true type="text" class="text-area" placeholder="@PrettyJson" />
+                <button class="@(CopySuccess ? "bg-info": "")" @onclick="CopyContents">Copy To Clipboard</button>
+            </div>
+        </div>
+    }
+
+</div>
 
 @if(!string.IsNullOrEmpty(InvalidJson))
 {
@@ -63,10 +69,28 @@
 
 
 <style>
+    .float-right {
+        float:right;
+    }
 
+    .center-stuff {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+
+    .container {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+    
     .fixed-height {
         height: 39px;
     }
+
     .text-area {
         resize: vertical;
         height: 300px;
