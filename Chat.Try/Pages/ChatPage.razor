@@ -203,6 +203,7 @@
 
             _displayMessages.RefreshMe();
             Conversations = _chatAccessor.GetUserConversations(_userId);
+            RefreshConversations = Conversations;
             StateHasChanged();
             //await HubConnection.SendAsync("SendUserMessage", UserId, messageInput);
         }
@@ -497,7 +498,7 @@
 
     .msg_history {
         display: flex;
-        height: 516px;
+        height: 500px;
         overflow-y: auto;
     }
 </style>
