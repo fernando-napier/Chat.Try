@@ -71,11 +71,15 @@
     </Authorized>
 
     <NotAuthorized>
-        <h1>Hello, inauthentic user!</h1>
-        <p>In order to interact with others Login or Register</p>
-        <a href="#">Go Home</a>
+        <div class="row center-stuff">
+            <div class="col-12 col-md-8">
+                <h1>Hello, unauthenticated user!</h1>
+                <p>Unfortunately Chat functionality is not available for unathenticated users.</p>
+                <p>In order to authenticate and interact with others <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+                <a href="#">Go Home</a>
+            </div>
+        </div>
     </NotAuthorized>
-
 </AuthorizeView>
 
 
@@ -500,5 +504,16 @@
         display: flex;
         height: 480px;
         overflow-y: auto;
+    }
+
+    .write_msg {
+        resize: none;
+    }
+
+    .center-stuff {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
     }
 </style>
