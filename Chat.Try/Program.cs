@@ -19,6 +19,7 @@ builder.Services.AddScoped<Configuration>(opt =>
     {
         PythonPath = builder.Configuration.GetValue<string>("PythonPath"),
         YoutubeDLPath = builder.Configuration.GetValue<string>("YoutubeDLPath"),
+        MapAccessToken = builder.Configuration.GetValue<string>("MapAccessToken"),
     };
 });
 
