@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BlazorMapbox\Blazor.Mapbox\Blazor.Mapbox.csproj" />
     <ProjectReference Include="..\Chat.Try.Db\Chat.Try.Db.csproj" />
   </ItemGroup>
 
