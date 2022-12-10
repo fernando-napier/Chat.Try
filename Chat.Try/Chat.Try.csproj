@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="BlazorDownloadFileFast" Version="0.2.0" />
-    <PackageReference Include="BlazorMapbox" Version="0.0.1" />
+    <PackageReference Include="Fennorad.Mapbox" Version="0.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.10" />
