@@ -11,31 +11,89 @@
 
 <PageTitle>Fennorad</PageTitle>
 
-<AuthorizeView>
-    <Authorized>
-        <h1>Hello, authenticated world!</h1>
-        @if(user != null)
-        {
-            <p>Thank you for joining us today @user.Identity.Name!</p>
-            <p>If you'd like to use the features on this site click on either <a href="chat">Chat</a> or <a href="counter">Counter</a> to join in on the fun</p>
-        }
-        else
-        {
-            <p>This is a landing page for the example user. If you refresh the page you will be logged out. If you would like to maintain logged in state then you will need to properly register or login</p>
-            <p>If you'd like to use the features on this site click on either <a href="chat">Chat</a> or <a href="counter">Counter</a> to join in on the fun</p>
-        }
+<div class="row center-stuff">
+    <div class="col-12 col-md-8">
+        <AuthorizeView>
+            <Authorized>
+                @if(user != null)
+                {
+                    <h1>Hello, @user.Identity.Name!</h1>
+                    <p>Thank you for joining us today</p>
+                }
+                else
+                {
+                    <h1>Hello, User!</h1>
+                    <p>There are some issues with your login. Log back in to remedy the issue :)</p>
+                }
+            </Authorized>
 
-    </Authorized>
 
-
-    <NotAuthorized>
-        <h1>Hello,  user!</h1>
-        <p>In order to interact with others Login or Register</p>
-        <p>If you just want to take a peek inside, login using our example user</p>
-        <button @onclick=Submit>Sign in as the example user</button>
-    </NotAuthorized>
+            <NotAuthorized>
+                        <h1>Hello, user!</h1>
+                        <p>In order to authenticate and interact with others <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+            </NotAuthorized>
  
-</AuthorizeView>
+        </AuthorizeView>
+        <br />
+    </div>
+    <div class="col-12 col-md-8">
+        <h5>Currently Available Functionality:</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Page</th>
+                    <th scope="col">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td><a href="chat">Chat</a></td>
+                    <td>
+                        <ul>
+                            <li>Search for users and start new convos</li>
+                            <li>Send messages back and forth between 2 users</li>
+                            <li>Unread messages result in notification of new message</li>
+                        </ul>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">2</th>
+                    <td><a href="youtube">Youtube</a></td>
+                    <td>
+                        <ul>
+                            <li>Allows for download of youtube videos (20MB limit)</li>
+                            <li>Choose between mp3 and mp4 format</li>
+                            <li>Might not be super legal</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td><a href="beautify">Beautify</a></td>
+                    <td>
+                        <ul>
+                            <li>Beautifies strings of JSON or XML</li>
+                            <li>Useful when debugging API calls locally</li>
+                            <li>Doesn't store the result of beautification</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .center-stuff {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+</style>
 
 @code{
 
@@ -49,30 +107,6 @@
         if (!user.Identity.IsAuthenticated)
         {
             user = null;
-        }
-    }
-
-    protected async Task Submit()
-    {
-        var user = await UserManager.FindByNameAsync("example@user.com");
-        var valid = await SignInManager.UserManager.CheckPasswordAsync(user, "Password1!");
-
-        if (valid)
-        {
-            var principal = await SignInManager.CreateUserPrincipalAsync(user);
-
-            var identity = new ClaimsIdentity(
-                principal.Claims,
-                Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme
-            );
-            principal = new System.Security.Claims.ClaimsPrincipal(identity);
-            HostAuthentication.SetAuthenticationState(Task.FromResult(new AuthenticationState(principal)));
-
-            // now the authState is updated
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-
-            navManager.NavigateTo("#", true);
-
         }
     }
 }
