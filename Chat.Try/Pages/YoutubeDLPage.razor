@@ -36,7 +36,7 @@
 <br />
 @if (DownloadProgress.Any())
 {
-    <div class="row">
+    <div class="row center-stuff">
         <div class="col-12 col-md-6 bg-secondary progress-update">
             @for (int i = DownloadProgress.Count - 1; i >= 0; i--)
             {
@@ -45,11 +45,19 @@
         </div>
     </div>
 }
-@if (DownloadComplete)
+@if (DownloadComplete && DownloadSuccess)
 {
-    <div class="row">
+    <div class="row center-stuff">
         <div class="col-12 col-md-6 bg-success  progress-complete">
             <p>Processing is complete! Now downloading to your browser. </p>
+        </div>
+    </div>
+}
+@if (DownloadComplete && !DownloadSuccess)
+{
+    <div class="row center-stuff">
+        <div class="col-12 col-md-6 bg-danger  progress-complete">
+            <p>Processing failed! See logs for details. </p>
         </div>
     </div>
 }
@@ -75,7 +83,7 @@
 
     .progress-update {
         margin-top: 20px;
-        height: 300px;
+        max-height: 300px;
         overflow: auto;
         display: flex!important;
         flex-direction: column-reverse;
@@ -105,6 +113,8 @@
     public Configuration Config { get; set; }
 
     private bool mp3Flag { get; set; }
+
+    private bool DownloadSuccess = false;
     private bool DownloadComplete = false;
     private bool IsDownloadActive = false;
     private string Url { get; set; }
@@ -113,8 +123,8 @@
 
     private async Task DownloadVideo()
     {
-
         IsDownloadActive = true;
+        DownloadSuccess = false;
         DownloadComplete = false;
         DownloadProgress = new List<string>();
         StateHasChanged();
@@ -154,8 +164,7 @@
             {
                 if (!String.IsNullOrEmpty(e.Data))
                 {
-                    var data = e.Data.Replace("[download]", "[Processing]");
-                    DownloadProgress.Add($"ERROR: {data}");
+                    DownloadProgress.Add(e.Data);
                 }
                 await InvokeAsync(() =>
                 {
@@ -165,7 +174,7 @@
             var options = new OptionSet()
                 {
                     Output = filename,
-                    MaxFilesize = "10.0m",
+                    MaxFilesize = "20.0m",
                 };
 
             if (mp3Flag)
@@ -173,14 +182,26 @@
                 options.ExtractAudio = mp3Flag;
                 options.AudioFormat = AudioConversionFormat.Mp3;
             }
-            
+
             // start running
             string[] urls = new[] { Url };
             await ytdlProc.RunAsync(urls, options);
 
-            await BlazorDownloadFileService.DownloadFileAsync(mp3Flag ? "download.mp3" : "download.mp4", File.ReadAllBytes(filename));
-            File.Delete(filename);
-            DownloadComplete = true;
+
+            var fileExists = File.Exists(filename);
+            if (fileExists)
+            {
+                await BlazorDownloadFileService.DownloadFileAsync(mp3Flag ? "download.mp3" : "download.mp4", File.ReadAllBytes(filename));
+                File.Delete(filename);
+                DownloadSuccess = true;
+            }
+            else
+            {
+                DownloadProgress.Add("Download file does not exist");
+                DownloadSuccess = false;
+            }
+
+            
         }
         catch (Exception ex)
         {
@@ -190,6 +211,7 @@
         }
 
         IsDownloadActive = false;
+        DownloadComplete = true;
         StateHasChanged();
     }
 }
