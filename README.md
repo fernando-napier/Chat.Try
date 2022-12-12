@@ -1,67 +1,43 @@
-# Fennorad
+<h2> Fennorad </h2>
+
+<h3> Introduction </h3>
+This is a blazor server project built with DotNet6, Sql Server, Blazor/Razor pages, Microsoft Identity, CSS, HTML, some javascript. This project also leverages Github Actions for building and deploying the application as well as deploying database changes. The application and database are hosted on my personal Azure account.
+
+<h3> Getting Started </h3>
+To access the website go to https://fennorad.azurewebsites.net/ and create an account or use the example user:
+
+User: `example-user`  
+Password: `password`  
 
 
-<h3>Summary of the project</h3>
+<h3>Functionality of the project</h3>
 
-This is my attempt at creating a Blazor Server application. Blazor Server is very handy for backend developers because it is almost purely a backend application and the UI elenemts are updated via SignalR.
+<h4> Chat </h4>  
+https://fennorad.azurewebsites.net/chat
 
-As of 11/25/22 I have deployed this application to my personal azure cloud. The site is https://fennorad.azurewebsites.net/ and will continually be getting updates because the application has deploy pipelines on the `main` repo branch. Most changes from now on will constitute a PR/MR as changes will affect the availability of the site.
+1) Allows any registered user to search for and chat with any existing user.
+2) Currently only text can be sent from one user to another
+3) User conversations, messages, and read receipts are stored to maintain a historical record of conversations
+4) Any unread user conversation will result in the user being alerted to new messages via the conversation tile flashing
+5) Can only be accessed by authenticated users
 
-If you would like to play around use:  
-User: `example@user.com`  
-Password: `Password1!`  
+<h4> Maps </h4>
+https://fennorad.azurewebsites.net/maps
 
-<h3>How to clone and run locally</h3>
+1) Allows any registered user to search for directions from one place to another.
+2) Allows for choosing driving, biking, walking
+3) Leverages the Mapbox API through my personal library [Fennorad.Mapbox](https://github.com/fernando-napier/Fennorad.Mapbox)
+4) Can only be accessed by authenticated users
 
-1) Ensure you have Dotnet 6 and Sql Server installed.
-2) Clone Repo
-3) Use Sql Server to Resore DB using the backup located [here](https://github.com/fernando-napier/Fennorad/tree/main/Fennorad.Db/DatabaseBackup)
-4) Run project and create users to chat back and forth with! 
+<h4> JSON/XML Beautifier </h4>
+https://fennorad.azurewebsites.net/beautify
 
-</details>
+1) Allows any user to paste a string of JSON or XML data and have it be returned in a pretty format.
+2) This is something that I use as a software engineer often and figured I could take a shot at writing the functionality myself.
+3) This is unlisted to unauthenticated users but can still be accessed.
 
-<details>
-  <summary><h3>Things in development</h3></summary>
-
-  
-* ~~Database design~~
-* ~~Auto generation of dbcontext via EFCore Power Tools~~
-* ~~Parent and child razor component interaction~~
-* ~~Basic logic/html/css to be able interact with other users~~
-* Notification upon new message received
-* ~~User Search auto-complete~~
-* SignalR realtime messaging between users
-  * currently 15 second refresh for new messages
-* ~~Better UI~~
-* Emoji support
-* ~~Data migration for easy cloning and setup~~
-* Allow for group chats
-* encrypt user messages to ensure user data isn't being monitored
-* ~~Deploy as a website~~ [the site is live](https://fennorad.azurewebsites.net/)
-* ~~Add CI/CD to main branch for deployments~~
-
-</details>
-
-<details>
-  <summary><h3>Database schema for Fennorad</h3></summary>
-
-Here is what the db components look like, the forking of the arrows implies a one-to-many relationship between the tables. These tables relate to each other via foreign keys, are represented in the DbContext, and allow for easy inclusion of the right data when passing messages between users.
-
-[![Untitled-Diagram-drawio.png](https://i.postimg.cc/66vB3htB/Untitled-Diagram-drawio.png)](https://postimg.cc/0rPTXDz4)
-
-</details>
-
-<details>
-  <summary><h3>Demo of the project</h3></summary>
-
-This is ~~a current~~ an outdated snapshot of what the chat capabilities look like (Clicking on the image will take you to youtube)
-  
-[![Fennorad Demo](https://i.postimg.cc/J4gPC8tK/Screenshot-2022-11-15-223722.png)](https://youtu.be/R_Ky4iRMuhs)
-
-Here is an updated UI version as of 11/18/22:
-
-[![Screenshot-2022-11-18-165319.png](https://i.postimg.cc/yxzjFCQm/Screenshot-2022-11-18-165319.png)](https://postimg.cc/9RJyhKj0)
-
-</details>
-
-
+<h4> Youtube Downloader </h4>
+https://fennorad.azurewebsites.net/youtube
+1) Allows any user to download youtube videos in either mp3 or mp4 format that is up to 20MB in size
+2) Leverages the `YoutubeDLSharp` library for downloading youtube videos and the `BlazorDownloadFileFast` libary for client side downloading.
+3) This is unlisted to unauthenticated users but can still be accessed.
