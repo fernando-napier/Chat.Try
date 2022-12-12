@@ -4,6 +4,8 @@ using Fennorad.Areas.Identity;
 using Fennorad.Data;
 using Fennorad.Db.Context;
 using Fennorad.Models;
+using Google.Apis.Services;
+using Google.Apis.YouTube.v3;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
@@ -22,8 +24,6 @@ builder.Services.AddScoped<Configuration>(opt =>
         MapAccessToken = builder.Configuration.GetValue<string>("MapAccessToken"),
     };
 });
-
-    
 
 // Add services to the container.
 builder.Services.AddScoped<IUserDbAccessor, UserDbAccessor>();
@@ -68,6 +68,12 @@ builder.Services.AddResponseCompression(opts =>
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 });
 builder.Services.AddBlazorDownloadFile();
+builder.Services.AddSingleton(new YouTubeService(new BaseClientService.Initializer()
+{
+    ApiKey = builder.Configuration.GetValue<string>("YoutubeApiKey"),
+    ApplicationName = "youtube-app-141704",
+
+})); ;
 
 var app = builder.Build();
 
