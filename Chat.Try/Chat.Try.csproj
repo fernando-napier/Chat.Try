@@ -8,19 +8,9 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
-  <!--<ItemGroup>
-    <Content Remove="wwwroot\Scripts\MapboxInterop.js" />
-    <Content Remove="wwwroot\Scripts\MapboxInterop.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="wwwroot\Scripts\MapboxInterop.js">
-      <LogicalName>blazor:js:%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>-->
-
   <ItemGroup>
     <PackageReference Include="BlazorDownloadFileFast" Version="0.2.0" />
+    <PackageReference Include="Fennorad.Mapbox" Version="0.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.10" />
@@ -38,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Chat.Try.Db\Chat.Try.Db.csproj" />
-    <ProjectReference Include="..\Fennorad.MapBox\Fennorad.MapBox.csproj" />
   </ItemGroup>
 
 </Project>
