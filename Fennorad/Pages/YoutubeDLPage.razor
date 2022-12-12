@@ -1,43 +1,58 @@
 ﻿@page "/youtube"
-@using System.Diagnostics;
-@using System.Text;
-@using Blazor.DownloadFileFast.Interfaces;
-@using System.Text.RegularExpressions;
-@using Fennorad.Models;
-@using YoutubeDLSharp;
-@using YoutubeDLSharp.Options;
+@using System.Diagnostics
+@using System.Text
+@using Blazor.DownloadFileFast.Interfaces
+@using System.Text.RegularExpressions
+@using Fennorad.Models
+@using YoutubeDLSharp
+@using YoutubeDLSharp.Options
+@using Google.Apis.Services
+@using Google.Apis.YouTube.v3
 @inject IJSRuntime JsRuntime
+@inject YouTubeService YoutubeService
 
 
 <div class="container">
     <div class="row center-stuff">
-        <div class="col-12 col-md-8">
+        <div class="col-12 col-md-10">
             <h2>YoutubeDL</h2>
             <p>This is an experimental page where users are allowed to download mp3s or mp4s of youtube videos.</p>
             <hr />
         </div>
     </div>
     <div class="row center-stuff">
-        <div class="col-12 col-md-8" style="margin-bottom: 5px;">
-            <input disabled=@IsDownloadActive @bind=Url type="text" style="width: 100%;" placeholder="https://www.youtube.com/">  
+        <div class="col-12 col-md-8" style="margin-bottom: 10px;">
+            <input disabled=@IsDownloadActive @bind=SearchQuery type="text" style="width: 100%;" placeholder="input search term">  
+        </div>
+        <div class="col-3 offset-9 col-md-1 offset-md-0">
+            <button class="float-right" disabled=@IsDownloadActive @onclick="SearchForVideos">Search</button>
         </div>
     </div>
+
+@if (Videos.Any())
+{
     <div class="row center-stuff">
-        <div class="col-5 col-md-3">
-            <input disabled=@IsDownloadActive id="checkbox" style="margin-right:3px;" type="checkbox" @bind="mp3Flag" />
-            <label for="checkbox">Audio Only?</label>
-        </div>
-        <div class="col-3 col-md-3 offset-4 offset-md-0">
-            <button class="float-right" disabled=@IsDownloadActive @onclick="DownloadVideo">Download</button>
-        </div>
+        @foreach (var video in Videos)
+        {
+
+             <div class="col-12 col-md-3 offset-0 offset-md-1" style="margin-bottom: 10px; margin-top: 10px;">
+                    <div class="center-stuff embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/@video.VideoId?rel=0" allowfullscreen></iframe>
+                </div>
+                <button disabled=@IsDownloadActive @onclick="(() => DownloadVideo(video.VideoId))">Download Video</button>
+                    <button disabled=@IsDownloadActive @onclick="(() => DownloadAudio(video.VideoId))">Download Audio</button>
+            </div>
+        }
     </div>
-</div>
+    
+}
+
 
 <br />
 @if (DownloadProgress.Any())
 {
     <div class="row center-stuff">
-        <div class="col-12 col-md-6 bg-secondary progress-update">
+        <div class="col-12 col-md-9 bg-secondary progress-update">
             @for (int i = DownloadProgress.Count - 1; i >= 0; i--)
             {
                 <p>@DownloadProgress.ElementAt(i)</p>
@@ -48,7 +63,7 @@
 @if (DownloadComplete && DownloadSuccess)
 {
     <div class="row center-stuff">
-        <div class="col-12 col-md-6 bg-success  progress-complete">
+        <div class="col-12 col-md-9 bg-success  progress-complete">
             <p>Processing is complete! Now downloading to your browser. </p>
         </div>
     </div>
@@ -56,11 +71,12 @@
 @if (DownloadComplete && !DownloadSuccess)
 {
     <div class="row center-stuff">
-        <div class="col-12 col-md-6 bg-danger  progress-complete">
+        <div class="col-12 col-md-9 bg-danger  progress-complete">
             <p>Processing failed! See logs for details. </p>
         </div>
     </div>
 }
+</div>
 
 <style>
     .float-right {
@@ -83,7 +99,7 @@
 
     .progress-update {
         margin-top: 20px;
-        max-height: 300px;
+        max-height: 200px;
         overflow: auto;
         display: flex!important;
         flex-direction: column-reverse;
@@ -112,17 +128,51 @@
     [Inject]
     public Configuration Config { get; set; }
 
-    private bool mp3Flag { get; set; }
+    private List<YoutubeVideo> Videos { get; set; } = new List<YoutubeVideo>();
 
     private bool DownloadSuccess = false;
     private bool DownloadComplete = false;
     private bool IsDownloadActive = false;
-    private string Url { get; set; }
+    private string SearchQuery { get; set; }
     private List<string> DownloadProgress = new List<string>();
     private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
 
-    private async Task DownloadVideo()
+    private async Task SearchForVideos()
     {
+        if (!string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            Videos = new List<YoutubeVideo>();
+            var searchListRequest = YoutubeService.Search.List("snippet");
+            searchListRequest.Q = SearchQuery;
+            searchListRequest.Type = "video";
+            searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Relevance;
+            searchListRequest.MaxResults = 9;
+
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+            Videos.AddRange(searchListResponse.Items.Select(video => new YoutubeVideo
+                {
+                    Thumbnail = video.Snippet.Thumbnails.High.Url,
+                    Title = video.Snippet.Title,
+                    VideoId = video.Id.VideoId,
+                }));
+        }
+
+    }
+
+    private async Task DownloadVideo(string videoId)
+    {
+        await Download(videoId);
+    }
+
+    private async Task DownloadAudio(string videoId)
+    {
+        await Download(videoId, true);
+
+    }
+
+    private async Task Download(string videoId, bool mp3Flag = false)
+    {
+        var youtubeUrl = $"https://www.youtube.com/watch?v={videoId}";
         IsDownloadActive = true;
         DownloadSuccess = false;
         DownloadComplete = false;
@@ -131,7 +181,7 @@
         var filename = mp3Flag ? $"{Guid.NewGuid()}.mp3" : $"{Guid.NewGuid()}.mp4";
 
 
-        if (string.IsNullOrEmpty(Url) || !regex.IsMatch(Url))
+        if (string.IsNullOrEmpty(youtubeUrl) || !regex.IsMatch(youtubeUrl))
         {
             await JsRuntime.InvokeVoidAsync("alert", "Not a valid youtube url!");
             IsDownloadActive = false;
@@ -141,6 +191,9 @@
 
         DownloadProgress.Add("Setting up process...");
         StateHasChanged();
+
+        await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
 
         try
         {
@@ -160,7 +213,7 @@
                     StateHasChanged();
                 });
             };
-            ytdlProc.ErrorReceived += async (o, e) => 
+            ytdlProc.ErrorReceived += async (o, e) =>
             {
                 if (!String.IsNullOrEmpty(e.Data))
                 {
@@ -184,7 +237,7 @@
             }
 
             // start running
-            string[] urls = new[] { Url };
+            string[] urls = new[] { youtubeUrl };
             await ytdlProc.RunAsync(urls, options);
 
 
@@ -201,7 +254,6 @@
                 DownloadSuccess = false;
             }
 
-            
         }
         catch (Exception ex)
         {
@@ -213,5 +265,8 @@
         IsDownloadActive = false;
         DownloadComplete = true;
         StateHasChanged();
+
+        await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
     }
 }
