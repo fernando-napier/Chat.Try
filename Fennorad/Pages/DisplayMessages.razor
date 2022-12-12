@@ -1,0 +1,184 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.SignalR.Client
+@using Fennorad.Models
+@inject Fennorad.Accessors.IChatDbAccessor _chatAccessor
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@implements IAsyncDisposable
+
+@foreach (var message in DisplayMessageList)
+{
+    @if (message.UserId == UserId)
+    {
+        <div class="outgoing_msg">
+            <div class="sent_msg">
+                <div class="sent_withd_msg">
+                    <p>
+                        @message.Message
+                    </p>
+                    <span class="time_date"> @message?.CreatedOn.ToString("MM/dd/yy HH:mm")</span>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="incoming_msg">
+            <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+            <div class="received_msg">
+                <div class="received_withd_msg">
+                    <p>
+                        @message.Message
+                    </p>
+                    <span class="time_date"> @message?.CreatedOn.ToString("MM/dd/yy HH:mm")</span>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<style>
+    .scroll {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .chatboard {
+        display: grid;
+        width: 100%;
+        grid-gap: 0.6rem;
+        max-width: 40rem;
+    }
+
+    .sent,
+    .received {
+        padding: 1%;
+        min-width: 20rem;
+        border-radius: 0.6rem;
+    }
+
+    .received {
+        justify-self: left;
+        color: white;
+    }
+
+    .sent {
+        text-align: right;
+        justify-self: right;
+        align-content: right;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Conversations Conversation { get; set; } 
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public string OtherUserId { get; set; }
+
+    private HubConnection HubConnection;
+    private List<DisplayMessage> DisplayMessageList = new();
+    private string NewMessage { get; set; }
+    private Timer Timer { get; set; }
+
+    public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Timer == null)
+        {
+            Timer = new System.Threading.Timer((_) =>
+            {
+                InvokeAsync(async () =>
+            {
+                // Update the UI
+                var tempMessages = _chatAccessor.GetUserMessages(Conversation.Id).Select(x => new DisplayMessage
+                {
+                    UserId = x.ConversationUser.UserId,
+                    UserName = x.ConversationUser.User.UserName,
+                    Message = x.Message,
+                    CreatedOn = x.CreatedOn
+                });
+
+
+                DisplayMessageList = tempMessages.OrderByDescending(x => x.CreatedOn).ToList();
+                StateHasChanged();
+
+            });
+            }, null, 0, 15000);
+        }
+
+        RefreshMessages();
+
+
+
+        //HubConnection = new HubConnectionBuilder()
+        //    .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        //    .Build();
+
+        //HubConnection.On<string, string>("ReceiveUserMessage", (userId, message) =>
+        //{
+        //    Conversation.ConversationUsers.First(x => x.UserId == userId)
+        //        .UserMessages.Add(new UserMessages { Message = message, CreatedOn = DateTimeOffset.Now });
+
+        //    StateHasChanged();
+        //});
+
+        //await HubConnection.StartAsync();
+    }
+
+    private void RefreshMessages()
+    {
+        var tempMessages = _chatAccessor.GetUserMessages(Conversation.Id).Select(x => new DisplayMessage
+            {
+                UserId = x.ConversationUser.UserId,
+                UserName = x.ConversationUser.User.UserName,
+                Message = x.Message,
+                CreatedOn = x.CreatedOn
+            });
+
+
+        DisplayMessageList = tempMessages.OrderByDescending(x => x.CreatedOn).ToList();
+        StateHasChanged();
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        parameters.TryGetValue<Conversations>(nameof(Conversation), out var convo);
+        Conversation = convo;
+        parameters.TryGetValue<string>(nameof(UserId), out var userId);
+        UserId = userId;
+        OtherUserId = Conversation.ConversationUsers.First(x => x.UserId != UserId).UserId;
+
+        var messages = Conversation.ConversationUsers.SelectMany(x => x.UserMessages)
+            .Select(x => new DisplayMessage
+                {
+                    UserId = x.ConversationUser.UserId,
+                    UserName = x.ConversationUser.User.UserName,
+                    Message = x.Message,
+                    CreatedOn = x.CreatedOn
+                });
+        DisplayMessageList = messages.OrderByDescending(x => x.CreatedOn).ToList();
+
+        await base.SetParametersAsync(parameters);
+        StateHasChanged();
+    }
+
+    private async Task SendAsync()
+    {
+        
+    }
+
+    public void RefreshMe()
+    {
+        RefreshMessages();
+        StateHasChanged();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+}

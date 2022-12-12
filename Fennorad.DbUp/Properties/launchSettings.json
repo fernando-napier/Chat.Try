@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Fennorad.DbUp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "connectionStrings:Chat": "Server=FERNANDO\\SQLEXPRESS;Database=Chat;Trusted_Connection=True;MultipleActiveResultSets=true;Encrypt=False"
+      }
+    }
+  }
+}

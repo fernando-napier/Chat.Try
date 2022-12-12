@@ -1,0 +1,190 @@
+﻿@inherits ChatPage;
+@inject Fennorad.Accessors.IChatDbAccessor _chatAccessor
+
+<div class="card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item disabled">Existing Convos</li>
+        @foreach(var conversation in Conversations)
+        {
+            var hasUnreadMessages = HasUnreadMessages(conversation);
+            @foreach (var convoUser in conversation.ConversationUsers)
+            {
+                @if (convoUser.UserId != UserId)
+                {
+                    var recentMessage = conversation.ConversationUsers.SelectMany(x => x.UserMessages).OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+                    var sentOrReceived = recentMessage == null ? "None" : null;
+                    if (sentOrReceived == null)
+                    {
+                        sentOrReceived = recentMessage.ConversationUser.UserId == UserId ? "Sent" : "Received";
+                    }
+                    <div class="chat_list @UnreadMessagesAlert(hasUnreadMessages) @SelectConversation(conversation, hasUnreadMessages)" @onclick="() => SetSelect(conversation)">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>@convoUser.User.UserName<span class="chat_date">@(recentMessage?.CreatedOn.ToString("MM/dd/yy HH:mm") ?? "")</span></h5>
+                                <p>
+                                    @(recentMessage?.Message ?? "No messages yet")
+                                </p>
+                                <small>@sentOrReceived</small>
+                                
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </ul>
+</div>
+
+<style>
+    small {
+        font-size: 10px;
+    }
+
+    .blink-bg{
+		color: #fff;
+		padding: 10px;
+		display: inline-block;
+		border-radius: 5px;
+		animation: blinkingBackground 2s infinite;
+	}
+	@@keyframes blinkingBackground{
+		0%		{ background-color: #10c018;}
+		25%		{ background-color: #1056c0;}
+		50%		{ background-color: #10c018;}
+		75%		{ background-color: #1056c0;}
+		100%	{ background-color: #04a1d5;}
+	}
+</style>
+
+@code {
+    [Parameter]
+    public List<Conversations> Conversations { get; set; }
+
+    [Parameter]
+    public EventCallback<Conversations> SelectedConversationChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<List<Conversations>> RefreshConversationsChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> MobileMessageViewFlagChanged { get; set; }
+
+    [Parameter]
+    public bool MobileMessageViewFlag { get; set; }
+
+    [Parameter]
+    public List<Conversations> RefreshConversations { get; set; }
+
+    [Parameter]
+    public Conversations SelectedConversation { get; set; }
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    private Timer Timer { get; set; }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Timer == null)
+        {
+            Timer = new System.Threading.Timer((_) =>
+            {
+                InvokeAsync(async () =>
+                {
+                    // Update the UI
+                    var refreshConversationsFlag = RefreshConvos();
+                    if (refreshConversationsFlag)
+                    {
+                        StateHasChanged();
+                    }
+                });
+            }, null, 0, 15000);
+        }
+    }
+
+    private bool RefreshConvos(bool hardRefresh = false)
+    {
+        var refreshConversations = _chatAccessor.RefreshConversations(UserId);
+        var refreshConversationsFlag = false;
+
+        foreach (var conversation in refreshConversations)
+        {
+            var existingConvo = Conversations.FirstOrDefault(x => x.Id == conversation.Id);
+            if (existingConvo == null ||
+                existingConvo.ConversationUsers.SelectMany(x => x.UserMessages).Count()
+                != conversation.ConversationUsers.SelectMany(x => x.UserMessages).Count())
+            {
+                refreshConversationsFlag = true;
+            }
+        }
+        if (refreshConversationsFlag || hardRefresh)
+        {
+            Conversations = refreshConversations;
+            RefreshConversations = refreshConversations;
+        }
+        return refreshConversationsFlag;
+    }
+
+    private string UnreadMessagesAlert(bool hasUnreadMessages)
+    {
+        return hasUnreadMessages ? "blink-bg" : string.Empty;
+    }
+
+    private bool HasUnreadMessages(Conversations convo)
+    {
+        var userMessages = convo.ConversationUsers.First(x => x.UserId != UserId).UserMessages;
+        return userMessages.Any() && userMessages.Any(x => !x.ReadReceipts.Any());
+    }
+
+    private string SelectConversation(Conversations conversation, bool hasUnreadMessages)
+    {
+        if (hasUnreadMessages)
+        {
+            return string.Empty;
+        }
+
+        return IsSelected(conversation) ? "bg-info text-white" : "bg-light";
+    }
+
+    bool IsSelected(Conversations conversation)
+    {
+        if (SelectedConversation == null)
+        {
+            SelectedConversation = new Conversations();
+        }
+
+        return SelectedConversation.Id == conversation.Id;
+    }
+
+
+    void SetSelect(Conversations conversation)
+    {
+
+        _chatAccessor.SetConversationRead(conversation.Id,
+                conversation.ConversationUsers.First(x => x.UserId == UserId).Id);
+        RefreshConvos(true);
+        if (IsSelected(conversation))
+        {
+            SelectedConversation = new Conversations();
+            SelectedConversationChanged.InvokeAsync(SelectedConversation);
+            RefreshConversationsChanged.InvokeAsync(RefreshConversations);
+        }
+        else
+        {
+            SelectedConversation = RefreshConversations.First(x => x.Id == conversation.Id);
+            SelectedConversationChanged.InvokeAsync(SelectedConversation);
+            RefreshConversationsChanged.InvokeAsync(RefreshConversations);   
+        }
+
+        MobileMessageViewFlag = true;
+        MobileMessageViewFlagChanged.InvokeAsync(MobileMessageViewFlag);
+        StateHasChanged();
+
+    }
+}
