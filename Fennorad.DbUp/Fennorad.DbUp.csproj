@@ -9,11 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\1.AddCounterUserUniqueIndex.sql" />
-    <None Remove="Scripts\2.AddForeignKeyCounterToUser.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Scripts\*" />
   </ItemGroup>
 
