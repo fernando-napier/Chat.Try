@@ -1,4 +1,4 @@
-# Chat.Try
+# Fennorad
 
 
 <h3>Summary of the project</h3>
@@ -15,7 +15,7 @@ Password: `Password1!`
 
 1) Ensure you have Dotnet 6 and Sql Server installed.
 2) Clone Repo
-3) Use Sql Server to Resore DB using the backup located [here](https://github.com/fernando-napier/Chat.Try/tree/main/Chat.Try.Db/DatabaseBackup)
+3) Use Sql Server to Resore DB using the backup located [here](https://github.com/fernando-napier/Fennorad/tree/main/Fennorad.Db/DatabaseBackup)
 4) Run project and create users to chat back and forth with! 
 
 </details>
@@ -43,7 +43,7 @@ Password: `Password1!`
 </details>
 
 <details>
-  <summary><h3>Database schema for Chat.Try</h3></summary>
+  <summary><h3>Database schema for Fennorad</h3></summary>
 
 Here is what the db components look like, the forking of the arrows implies a one-to-many relationship between the tables. These tables relate to each other via foreign keys, are represented in the DbContext, and allow for easy inclusion of the right data when passing messages between users.
 
@@ -56,7 +56,7 @@ Here is what the db components look like, the forking of the arrows implies a on
 
 This is ~~a current~~ an outdated snapshot of what the chat capabilities look like (Clicking on the image will take you to youtube)
   
-[![Chat.Try Demo](https://i.postimg.cc/J4gPC8tK/Screenshot-2022-11-15-223722.png)](https://youtu.be/R_Ky4iRMuhs)
+[![Fennorad Demo](https://i.postimg.cc/J4gPC8tK/Screenshot-2022-11-15-223722.png)](https://youtu.be/R_Ky4iRMuhs)
 
 Here is an updated UI version as of 11/18/22:
 

@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
-      Project: Chat.Try.DbUp
+      Project: Fennorad.DbUp
 
     steps:
       - uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: dbup
     env:
-      Project: Chat.Try
+      Project: Fennorad
 
     steps:
       - uses: actions/checkout@v2

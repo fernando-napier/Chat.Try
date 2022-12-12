@@ -1,0 +1,96 @@
+﻿@page "/maps"
+@using Fennorad.Mapbox
+@using Fennorad.Mapbox.Models
+@using Fennorad.Models
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Maps</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="container">
+            <div class="row center-stuff">
+                <div class="col-12 col-md-8">
+                    @if (AccessToken != null)
+                    {
+                        <h2>Map Directions</h2>
+                        <p>This map is powered by MapBox.</p>
+                        <hr />
+                        <MapboxMap Options=@Options AccessToken=@AccessToken AddDirectionsFlag=@true AddGeoLocationFlag=@true></MapboxMap>
+                    }
+                    else
+                    {
+                        <p>AccessToken is not set. Retry after setting AccessToken.</p>
+                    }
+                    
+                </div>
+            </div>
+        </div>
+        
+    </Authorized>
+    <NotAuthorized>
+        <div class="row center-stuff">
+            <div class="col-12 col-md-8">
+                <h1>Hello, unauthenticated user!</h1>
+                <p>Unfortunately Maps functionality is not available for unathenticated users</p>
+                <p>In order to authenticate and use this service <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+                <a href="#">Go Home</a>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    [Inject]
+    public Configuration Config { get; set; }
+    private bool UpdateCenter { get; set; } = false;
+    private string AccessToken { get; set; }
+    private Options Options { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        AccessToken = Config.MapAccessToken;
+        var result = await JsRuntime.InvokeAsync<Location>("getGpsLocation");
+        if (Options == null || result.Long != Options.Center.Lng || result.Lat != Options.Center.Lat)
+        {
+            UpdateCenter = true;
+        }
+        if (firstRender || UpdateCenter)
+        {
+            Options = new Options()
+            {
+                AccessToken = Config.MapAccessToken,
+                Center = new LngLat(lat: result.Lat, lng: result.Long),
+                MinZoom = 3,
+                MaxZoom = 20,
+                Zoom = 10,
+            };
+            StateHasChanged();
+        }
+        UpdateCenter = false;
+
+    }
+}
+    
+
+
+
+<style>
+    .float-right {
+        float:right;
+    }
+
+    .center-stuff {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+
+    .container {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+</style>
