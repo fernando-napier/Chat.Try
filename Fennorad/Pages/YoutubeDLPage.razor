@@ -22,10 +22,10 @@
         </div>
     </div>
     <div class="row center-stuff">
-        <div class="col-12 col-md-8" style="margin-bottom: 10px;">
+        <div class="col-12 col-md-8" style="margin-bottom: 5px;">
             <input disabled=@IsDownloadActive @bind=SearchQuery type="text" style="width: 100%;" placeholder="input search term">  
         </div>
-        <div class="col-3 offset-9 col-md-1 offset-md-0">
+        <div class="col-3 offset-9 col-md-1 offset-md-0" style="margin-bottom: 25px;">
             <button class="float-right" disabled=@IsDownloadActive @onclick="SearchForVideos">Search</button>
         </div>
     </div>
@@ -33,22 +33,13 @@
 @if (Videos.Any())
 {
         var count = Videos.Count;
-        <div class="row center-stuff">
-            <div id="myCarousel" class="carousel slide col-12 col-md-10" data-bs-ride="carousel">
-                <!-- Carousel indicators -->
-                <ol class="carousel-indicators">
-                    @for(int i = 0; i < count; i++)
-                    {
-                        <li data-bs-target="#myCarousel" data-bs-slide-to=@i class="@(i == 0 ? "active" : "")"></li>
-                    }
-                </ol>
-
-                <!-- Wrapper for carousel items -->
+        <div class="row center-stuff" style="margin-bottom: 25px;">
+            <div id="myCarousel" class="carousel slide col-12 col-md-10">
                 <Carousel @bind-SelectedSlide=@ChosenVideoId Autoplay="false" AutoRepeat="false">
                     @for (int i = 0; i < count; i++)
                     {
                         var video = Videos.ElementAt(i);
-                        <CarouselSlide Name="@video.VideoId">
+                        <CarouselSlide Name=@i.ToString()>
                             <div class="embed-container">
                                 <iframe src="https://www.youtube.com/embed/@video.VideoId?rel=0" allowfullscreen></iframe>
 
@@ -56,7 +47,7 @@
                         </CarouselSlide>
                     }
                 </Carousel>
-                <select disabled=@IsDownloadActive id="downloadOptions" name="downloadOptions" @onchange=DownloadStuff class="form-select" aria-label="Default select example">
+                <select disabled=@(IsDownloadActive) id="downloadOptions" name="downloadOptions" @onchange=DownloadStuff class="form-select" aria-label="Default select example">
                     <option selected>Donwload Options</option>
                     <option value="video">Download Video</option>
                     <option value="audio">Download Audio</option>
@@ -165,8 +156,7 @@
     public Configuration Config { get; set; }
 
     private List<YoutubeVideo> Videos { get; set; } = new List<YoutubeVideo>();
-
-    private string ChosenVideoId { get; set; }
+    private string ChosenVideoId { get; set; } = "0";
 
     private bool DownloadSuccess = false;
     private bool DownloadComplete = false;
@@ -175,12 +165,19 @@
     private List<string> DownloadProgress = new List<string>();
     private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
 
+    private void OnChange()
+    {
+        
+    }
+
     private async Task DownloadStuff(ChangeEventArgs args)
     {
-        if (string.IsNullOrWhiteSpace(ChosenVideoId))
+        if (!int.TryParse(ChosenVideoId, out var index))
         {
             return;
         }
+
+        var video = Videos.ElementAt(index);
 
         if (args.Value.ToString() == "video")
         {
@@ -194,9 +191,14 @@
 
     private async Task SearchForVideos()
     {
+        DownloadSuccess = false;
+        DownloadComplete = false;
+        DownloadProgress = new List<string>();
+        Videos = new List<YoutubeVideo>();
+        StateHasChanged();
+
         if (!string.IsNullOrWhiteSpace(SearchQuery))
         {
-            Videos = new List<YoutubeVideo>();
             var searchListRequest = YoutubeService.Search.List("snippet");
             searchListRequest.Q = SearchQuery;
             searchListRequest.Type = "video";
