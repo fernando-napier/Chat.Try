@@ -56,27 +56,12 @@
                         </CarouselSlide>
                     }
                 </Carousel>
-                <select disabled=@IsDownloadActive id="SearchStateId" name="stateId" @onchange=DownloadStuff class="form-select" aria-label="Default select example">
-                    <option>Donwload Options</option>
+                <select disabled=@IsDownloadActive id="downloadOptions" name="downloadOptions" @onchange=DownloadStuff class="form-select" aria-label="Default select example">
+                    <option selected>Donwload Options</option>
                     <option value="video">Download Video</option>
                     <option value="audio">Download Audio</option>
                 </select>
             </div>
-       @* @foreach (var video in Videos)
-        {
-
-            <div class="col-12 col-md-10" style="margin-bottom: 10px; margin-top: 10px;">
-                <div class="embed-container">
-                    <iframe src="https://www.youtube.com/embed/@video.VideoId?rel=0" allowfullscreen></iframe>
-                    
-                </div>
-                <select disabled=@IsDownloadActive id="SearchStateId" name="stateId" @onchange="@((args) => DownloadStuff(args, @video.VideoId))" class="form-select" aria-label="Default select example">
-                    <option>Donwload Options</option>
-                    <option value="video">Download Video</option>
-                    <option value="audio">Download Audio</option>
-                </select>
-            </div>
-        }*@
     </div>
     
 }
@@ -110,6 +95,7 @@
         </div>
     </div>
 }
+
 </div>
 
 <style>
@@ -325,6 +311,7 @@
         StateHasChanged();
 
         await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("resetSelect");
         await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
     }
 }

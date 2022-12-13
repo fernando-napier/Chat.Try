@@ -38,3 +38,7 @@ async function getGpsLocation() {
         long: position.coords.longitude
     }
 }
+
+function resetSelect() {
+    document.getElementById('downloadOptions').selectedIndex = 0;
+}
