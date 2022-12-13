@@ -1,4 +1,7 @@
 using BlazorChat;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using Fennorad.Accessors;
 using Fennorad.Areas.Identity;
 using Fennorad.Data;
@@ -73,7 +76,14 @@ builder.Services.AddSingleton(new YouTubeService(new BaseClientService.Initializ
     ApiKey = builder.Configuration.GetValue<string>("YoutubeApiKey"),
     ApplicationName = "youtube-app-141704",
 
-})); ;
+}));
+builder.Services
+    .AddBlazorise(options =>
+    {
+        options.Immediate = true;
+    })
+    .AddBootstrapProviders()
+    .AddFontAwesomeIcons();
 
 var app = builder.Build();
 
@@ -88,6 +98,8 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+
 
 app.UseHttpsRedirection();
 

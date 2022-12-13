@@ -3,6 +3,7 @@
 @using System.Text
 @using Blazor.DownloadFileFast.Interfaces
 @using System.Text.RegularExpressions
+@using Blazorise
 @using Fennorad.Models
 @using YoutubeDLSharp
 @using YoutubeDLSharp.Options
@@ -31,18 +32,36 @@
 
 @if (Videos.Any())
 {
-    <div class="row center-stuff">
-        @foreach (var video in Videos)
-        {
+        var count = Videos.Count;
+        <div class="row center-stuff">
+            <div id="myCarousel" class="carousel slide col-12 col-md-10" data-bs-ride="carousel">
+                <!-- Carousel indicators -->
+                <ol class="carousel-indicators">
+                    @for(int i = 0; i < count; i++)
+                    {
+                        <li data-bs-target="#myCarousel" data-bs-slide-to=@i class="@(i == 0 ? "active" : "")"></li>
+                    }
+                </ol>
 
-             <div class="col-12 col-md-3 offset-0 offset-md-1" style="margin-bottom: 10px; margin-top: 10px;">
-                    <div class="center-stuff embed-responsive embed-responsive-16by9">
-                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/@video.VideoId?rel=0" allowfullscreen></iframe>
-                </div>
-                <button disabled=@IsDownloadActive @onclick="(() => DownloadVideo(video.VideoId))">Download Video</button>
-                    <button disabled=@IsDownloadActive @onclick="(() => DownloadAudio(video.VideoId))">Download Audio</button>
+                <!-- Wrapper for carousel items -->
+                <Carousel @bind-SelectedSlide=@ChosenVideoId Autoplay="false" AutoRepeat="false">
+                    @for (int i = 0; i < count; i++)
+                    {
+                        var video = Videos.ElementAt(i);
+                        <CarouselSlide Name="@video.VideoId">
+                            <div class="embed-container">
+                                <iframe src="https://www.youtube.com/embed/@video.VideoId?rel=0" allowfullscreen></iframe>
+
+                            </div>
+                        </CarouselSlide>
+                    }
+                </Carousel>
+                <select disabled=@IsDownloadActive id="downloadOptions" name="downloadOptions" @onchange=DownloadStuff class="form-select" aria-label="Default select example">
+                    <option selected>Donwload Options</option>
+                    <option value="video">Download Video</option>
+                    <option value="audio">Download Audio</option>
+                </select>
             </div>
-        }
     </div>
     
 }
@@ -76,6 +95,7 @@
         </div>
     </div>
 }
+
 </div>
 
 <style>
@@ -118,6 +138,22 @@
         float: right;
         width: 100px;
     }
+
+    .embed-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .embed-container iframe, .embed-container object, .embed-container embed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
     
 </style>
 
@@ -130,12 +166,31 @@
 
     private List<YoutubeVideo> Videos { get; set; } = new List<YoutubeVideo>();
 
+    private string ChosenVideoId { get; set; }
+
     private bool DownloadSuccess = false;
     private bool DownloadComplete = false;
     private bool IsDownloadActive = false;
     private string SearchQuery { get; set; }
     private List<string> DownloadProgress = new List<string>();
     private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
+
+    private async Task DownloadStuff(ChangeEventArgs args)
+    {
+        if (string.IsNullOrWhiteSpace(ChosenVideoId))
+        {
+            return;
+        }
+
+        if (args.Value.ToString() == "video")
+        {
+            await Download(ChosenVideoId);
+        }
+        else if (args.Value.ToString() == "audio")
+        {
+            await Download(ChosenVideoId, true);
+        }
+    }
 
     private async Task SearchForVideos()
     {
@@ -146,7 +201,7 @@
             searchListRequest.Q = SearchQuery;
             searchListRequest.Type = "video";
             searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Relevance;
-            searchListRequest.MaxResults = 9;
+            searchListRequest.MaxResults = 5;
 
             var searchListResponse = await searchListRequest.ExecuteAsync();
             Videos.AddRange(searchListResponse.Items.Select(video => new YoutubeVideo
@@ -156,17 +211,6 @@
                     VideoId = video.Id.VideoId,
                 }));
         }
-
-    }
-
-    private async Task DownloadVideo(string videoId)
-    {
-        await Download(videoId);
-    }
-
-    private async Task DownloadAudio(string videoId)
-    {
-        await Download(videoId, true);
 
     }
 
@@ -267,6 +311,7 @@
         StateHasChanged();
 
         await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("resetSelect");
         await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
     }
 }
