@@ -38,6 +38,8 @@ https://fennorad.azurewebsites.net/beautify
 
 <h4> Youtube Downloader </h4>
 https://fennorad.azurewebsites.net/youtube
+
 1) Allows any user to download youtube videos in either mp3 or mp4 format that is up to 20MB in size
-2) Leverages the `YoutubeDLSharp` library for downloading youtube videos and the `BlazorDownloadFileFast` libary for client side downloading.
-3) This is unlisted to unauthenticated users but can still be accessed.
+2) videos are embedded so users can also just watch the video on this site
+3) Leverages the `YoutubeDLSharp` library for downloading youtube videos and the `BlazorDownloadFileFast` libary for client side downloading.
+4) This is unlisted to unauthenticated users but can still be accessed.
