@@ -318,9 +318,9 @@
         if (ctSource != null)
         {
             ctSource.Cancel();
+            ctSource = null;
         }
 
-        ctSource = null;
     }
 
     private CancellationToken InitializeCTSource()
