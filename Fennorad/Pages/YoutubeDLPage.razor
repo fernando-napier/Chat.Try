@@ -17,7 +17,7 @@
     <div class="row center-stuff">
         <div class="col-12 col-md-10">
             <h2>YoutubeDL</h2>
-            <p>This is an experimental page where users are allowed to download mp3s or mp4s of youtube videos.</p>
+            <p>This is an experimental page where users are allowed to search, watch, and even download youtube videos.</p>
             <hr />
         </div>
     </div>
@@ -59,15 +59,17 @@
 
 
 <br />
-@if (DownloadProgress.Any())
+@if (DownloadProgressList.Any())
 {
     <div class="row center-stuff">
+            <button class="real-center-stuff center-stuff col-4 bg-dark" style="margin-top:20px; color:yellow;" @onclick="CancelDownload">Cancel Download</button>
         <div class="col-12 col-md-9 bg-secondary progress-update">
-            @for (int i = DownloadProgress.Count - 1; i >= 0; i--)
+            @for (int i = DownloadProgressList.Count - 1; i >= 0; i--)
             {
-                <p>@DownloadProgress.ElementAt(i)</p>
+                <p>@DownloadProgressList.ElementAt(i)</p>
             }
         </div>
+
     </div>
 }
 @if (DownloadComplete && DownloadSuccess)
@@ -94,6 +96,11 @@
         float: right;
     }
 
+    .real-center-stuff {
+        justify-items: center;
+        align-items: center;
+    }
+
     .center-stuff {
         justify-content: space-evenly;
         align-content: space-evenly;
@@ -114,20 +121,6 @@
         overflow: auto;
         display: flex!important;
         flex-direction: column-reverse;
-    }
-    .yt-float-parent-element {
-        width: 80%;
-        display: inline-block;
-    }
-
-    .yt-float-child-element-left  {
-        float: left;
-        width: 70%;
-    }
-
-    .yt-float-child-element-right {
-        float: right;
-        width: 100px;
     }
 
     .embed-container {
@@ -161,7 +154,8 @@
     private bool DownloadComplete = false;
     private bool IsDownloadActive = false;
     private string SearchQuery { get; set; }
-    private List<string> DownloadProgress = new List<string>();
+    private List<string> DownloadProgressList = new List<string>();
+    private CancellationTokenSource ctSource = null;
     private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
 
     private async Task DownloadStuff(ChangeEventArgs args)
@@ -175,11 +169,11 @@
 
         if (args.Value.ToString() == "video")
         {
-            await Download(video.VideoId);
+            await Download(video);
         }
         else if (args.Value.ToString() == "audio")
         {
-            await Download(video.VideoId, true);
+            await Download(video, true);
         }
     }
 
@@ -187,7 +181,7 @@
     {
         DownloadSuccess = false;
         DownloadComplete = false;
-        DownloadProgress = new List<string>();
+        DownloadProgressList = new List<string>();
         Videos = new List<YoutubeVideo>();
         StateHasChanged();
 
@@ -210,15 +204,19 @@
 
     }
 
-    private async Task Download(string videoId, bool mp3Flag = false)
+    private async Task Download(YoutubeVideo video, bool mp3Flag = false)
     {
-        var youtubeUrl = $"https://www.youtube.com/watch?v={videoId}";
+        var youtubeUrl = $"https://www.youtube.com/watch?v={video.VideoId}";
         IsDownloadActive = true;
         DownloadSuccess = false;
         DownloadComplete = false;
-        DownloadProgress = new List<string>();
+        DownloadProgressList = new List<string>();
+        DownloadProgressList.Add(mp3Flag ? "Audio format (mp3) chosen for download." : "Video format(mp4) chosen for download.");
+        DownloadProgressList.Add($"[Title] {video.Title}");
         StateHasChanged();
         var filename = mp3Flag ? $"{Guid.NewGuid()}.mp3" : $"{Guid.NewGuid()}.mp4";
+
+
 
 
         if (string.IsNullOrEmpty(youtubeUrl) || !regex.IsMatch(youtubeUrl))
@@ -229,7 +227,7 @@
             return;
         }
 
-        DownloadProgress.Add("Setting up process...");
+        DownloadProgressList.Add("Setting up process...");
         StateHasChanged();
 
         await Task.Delay(200);
@@ -246,7 +244,7 @@
                 if (!String.IsNullOrEmpty(e.Data))
                 {
                     var data = e.Data.Replace("[download]", "[Processing]");
-                    DownloadProgress.Add(data);
+                    DownloadProgressList.Add(data);
                 }
                 await InvokeAsync(() =>
                 {
@@ -257,7 +255,7 @@
             {
                 if (!String.IsNullOrEmpty(e.Data))
                 {
-                    DownloadProgress.Add(e.Data);
+                    DownloadProgressList.Add(e.Data);
                 }
                 await InvokeAsync(() =>
                 {
@@ -278,8 +276,8 @@
 
             // start running
             string[] urls = new[] { youtubeUrl };
-            await ytdlProc.RunAsync(urls, options);
-
+            var ct = InitializeCTSource();
+            await ytdlProc.RunAsync(urls, options, ct);
 
             var fileExists = File.Exists(filename);
             if (fileExists)
@@ -290,15 +288,19 @@
             }
             else
             {
-                DownloadProgress.Add("Download file does not exist");
+                DownloadProgressList.Add("Download file does not exist");
                 DownloadSuccess = false;
             }
 
         }
+        catch (AggregateException ex)
+        {
+            DownloadProgressList.Add(ex.Message);
+            File.Delete(filename);
+        }
         catch (Exception ex)
         {
-            await JsRuntime.InvokeVoidAsync("alert", $"Youtube download failed, try again. {ex.Message}");
-            DownloadProgress.Add(ex.Message);
+            DownloadProgressList.Add(ex.Message);
             File.Delete(filename);
         }
 
@@ -309,5 +311,23 @@
         await Task.Delay(200);
         await JsRuntime.InvokeVoidAsync("resetSelect");
         await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
+    }
+
+    private void CancelDownload()
+    {
+        if (ctSource != null)
+        {
+            ctSource.Cancel();
+        }
+
+        ctSource = null;
+    }
+
+    private CancellationToken InitializeCTSource()
+    {
+        ctSource = new CancellationTokenSource();
+        var ct = ctSource.Token;
+        ct.Register(() => DownloadProgressList.Add("[FATAL] Process has been cancelled."));
+        return ct;
     }
 }
