@@ -181,11 +181,11 @@
 
         if (args.Value.ToString() == "video")
         {
-            await Download(ChosenVideoId);
+            await Download(video.VideoId);
         }
         else if (args.Value.ToString() == "audio")
         {
-            await Download(ChosenVideoId, true);
+            await Download(video.VideoId, true);
         }
     }
 
