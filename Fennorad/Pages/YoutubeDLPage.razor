@@ -321,6 +321,27 @@
                 return;
             }
 
+            ctSource = InitializeCTSource();
+
+            try
+            {
+
+                await ytdlProc.RunAsync(urls, options, ctSource.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                var fileToDelete = $"{filename}.part";
+                bool isLocked = true;
+                while (isLocked)
+                {
+                    await Task.Delay(1000);
+                    isLocked = WaitUntilFileNotLocked(fileToDelete);
+                }
+                
+                File.Delete(fileToDelete);
+                return;
+            }
+
             var fileExists = File.Exists(filename);
             if (fileExists)
             {
