@@ -376,7 +376,7 @@
         await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
     }
 
-    private void CancelDownload()
+    private async Task CancelDownload()
     {
         if (ctSource != null && !CtSourceIsDisposed)
         {
