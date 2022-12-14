@@ -64,7 +64,7 @@ builder.Services.AddScoped<IHostEnvironmentAuthenticationStateProvider>(sp => {
 });
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration.GetValue<string>("Azure:SignalR:ConnectionString"));
+builder.Services.AddSignalR();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddResponseCompression(opts =>
 {
