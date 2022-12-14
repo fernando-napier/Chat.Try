@@ -35,15 +35,14 @@
 {
         var count = Videos.Count;
         <div class="row center-stuff" style="margin-bottom: 25px;">
-            <div id="myCarousel" class="carousel slide col-12 col-md-10">
+            <div id="myCarousel" class="carousel slide col-md-10">
                 <Carousel @bind-SelectedSlide=@ChosenVideoId Autoplay="false" AutoRepeat="false">
                     @for (int i = 0; i < count; i++)
                     {
                         var video = Videos.ElementAt(i);
                         <CarouselSlide Name=@i.ToString()>
                             <div class="embed-container">
-                                <iframe src="https://www.youtube.com/embed/@video.VideoId?enablecastapi=1" allowfullscreen></iframe>
-
+                                <iframe id=@video.VideoId src="https://www.youtube.com/embed/@video.VideoId?&enablecastapi=1" allowfullscreen></iframe>
                             </div>
                         </CarouselSlide>
                     }
@@ -93,6 +92,16 @@
 </div>
 
 <style>
+    a.ytp-youtube-button.ytp-button {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    button.ytp-remote-button.ytp-button {
+        display:inline-block !important;
+        visibility: visible !important;
+    }
+
     .carousel-control-next, .carousel-control-prev {
         height: 30px;
         position: absolute;
@@ -163,6 +172,7 @@
     private string SearchQuery { get; set; }
     private List<string> DownloadProgressList = new List<string>();
     private CancellationTokenSource ctSource = null;
+    private bool CtSourceIsDisposed = false;
     private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
 
     private async Task DownloadStuff(ChangeEventArgs args)
@@ -208,6 +218,8 @@
                     Title = video.Snippet.Title,
                     VideoId = video.Id.VideoId,
                 }));
+            StateHasChanged();
+            await Task.Delay(1000);
         }
 
     }
@@ -218,6 +230,7 @@
         IsDownloadActive = true;
         DownloadSuccess = false;
         DownloadComplete = false;
+        CtSourceIsDisposed = false;
         DownloadProgressList = new List<string>();
         DownloadProgressList.Add(mp3Flag ? "Audio format (mp3) chosen for download." : "Video format(mp4) chosen for download.");
         DownloadProgressList.Add($"[Title] {video.Title}");
@@ -303,6 +316,27 @@
                     await Task.Delay(1000);
                     isLocked = WaitUntilFileNotLocked(fileToDelete);
                 }
+
+                File.Delete(fileToDelete);
+                return;
+            }
+
+            ctSource = InitializeCTSource();
+
+            try
+            {
+
+                await ytdlProc.RunAsync(urls, options, ctSource.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                var fileToDelete = $"{filename}.part";
+                bool isLocked = true;
+                while (isLocked)
+                {
+                    await Task.Delay(1000);
+                    isLocked = WaitUntilFileNotLocked(fileToDelete);
+                }
                 
                 File.Delete(fileToDelete);
                 return;
@@ -342,11 +376,18 @@
         await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
     }
 
-    private void CancelDownload()
+    private async Task CancelDownload()
     {
-        if (ctSource != null)
+        if (ctSource != null && !CtSourceIsDisposed)
         {
             ctSource.Cancel();
+            ctSource.Dispose();
+            CtSourceIsDisposed = true;
+            IsDownloadActive = false;
+            StateHasChanged();
+
+            await Task.Delay(200);
+            await JsRuntime.InvokeVoidAsync("resetSelect");
         }
 
     }
