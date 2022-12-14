@@ -230,6 +230,7 @@
         IsDownloadActive = true;
         DownloadSuccess = false;
         DownloadComplete = false;
+        CtSourceIsDisposed = false;
         DownloadProgressList = new List<string>();
         DownloadProgressList.Add(mp3Flag ? "Audio format (mp3) chosen for download." : "Video format(mp4) chosen for download.");
         DownloadProgressList.Add($"[Title] {video.Title}");
@@ -363,6 +364,9 @@
             CtSourceIsDisposed = true;
             IsDownloadActive = false;
             StateHasChanged();
+
+            await Task.Delay(200);
+            await JsRuntime.InvokeVoidAsync("resetSelect");
         }
 
     }
