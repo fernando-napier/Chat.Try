@@ -35,6 +35,7 @@
 @if (Videos.Any())
 {
         var count = Videos.Count;
+        <google-cast-launcher class="col-1 col-md-1 offset-md-2" id="castbutton"></google-cast-launcher>
         <div class="row center-stuff" style="margin-bottom: 25px;">
             <div id="myCarousel" class="carousel slide col-12 col-md-8">
                 <Carousel @bind-SelectedSlide=@ChosenVideoId Autoplay="false" AutoRepeat="false">
@@ -43,7 +44,7 @@
                         var video = Videos.ElementAt(i);
                         <CarouselSlide Name=@i.ToString()>
                             <div class="embed-container">
-                                <iframe id=@video.VideoId src="https://www.youtube.com/embed/@video.VideoId?&enablecastapi=1" allowfullscreen></iframe>
+                                <iframe id=@video.VideoId src="https://www.youtube.com/embed/@video.VideoId?wmode=opaque&enablecastapi=1" allowfullscreen></iframe>
                             </div>
                         </CarouselSlide>
                     }
@@ -94,7 +95,19 @@
 
 </div>
 
+
 <style>
+    google-cast-launcher {
+        display: block!important;
+        height: 20px;
+        width: 20px;
+    }
+
+    svg {
+        width:20px;
+        height:20px;
+    }
+
     a.ytp-youtube-button.ytp-button {
         display: none !important;
         visibility: hidden !important;
@@ -169,7 +182,7 @@
     public Configuration Config { get; set; }
 
     private List<YoutubeVideo> Videos { get; set; } = new List<YoutubeVideo>();
-    private string ChosenVideoId { get; set; } = "0";
+    private static string ChosenVideoId { get; set; } = "0";
     private bool DownloadSuccess = false;
     private bool DownloadComplete = false;
     private bool IsDownloadActive = false;
@@ -178,6 +191,9 @@
     private CancellationTokenSource ctSource = null;
     private bool CtSourceIsDisposed = false;
     private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
+
+    [JSInvokable("ChosenVideo")]
+    public static string ChosenVideo() => ChosenVideoId;
 
     private async Task DownloadStuff(ChangeEventArgs args)
     {
