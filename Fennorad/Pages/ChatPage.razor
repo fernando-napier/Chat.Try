@@ -12,61 +12,74 @@
 
 <AuthorizeView>
     <Authorized>
-        <div class="messaging">
-            <div class="inbox_msg">
-                <div class="inbox_people @((MobileMessageViewFlag ? "inbox_not_selected" : ""))">
-                    <div class="headind_srch @((MobileMessageViewFlag ? "hidden_stuff" : ""))">
-                <div class="recent_heading">
-                    <h4>Recent</h4>
+        <div class="container">
+            <div class="row center-stuff">
+                <div class="col-12 col-md-8">
+                    <h2>Chat Page</h2>
+                    <p>This is a page where one can strike up a conversation with any user or continue an ongoing convo.</p>
+                    <hr />
                 </div>
-                <div class="srch_bar">
-                    <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search for Users">
-                            @if (UserSearchResults != null && UserSearchResults.Any())
-                            {
-                                <ul class="list-group" style="position: absolute; z-index: 100;">
-                                    @foreach (var userChosen in UserSearchResults)
+            </div>
+            <div class="row center-stuff">
+                <div class="col-12 col-md-8">
+                    <div class="messaging">
+                        <div class="inbox_msg">
+                            <div class="inbox_people @((MobileMessageViewFlag ? "inbox_not_selected" : ""))">
+                                <div class="headind_srch @((MobileMessageViewFlag ? "hidden_stuff" : ""))">
+                            <div class="recent_heading">
+                                <h4>Recent</h4>
+                            </div>
+                            <div class="srch_bar">
+                                <input type="text" class="search-bar" @bind-value="UserSearch" @bind-value:event="oninput" @onkeyup="SearchForUser" placeholder="Search for Users">
+                                        @if (UserSearchResults != null && UserSearchResults.Any())
+                                        {
+                                            <ul class="list-group" style="position: absolute; z-index: 100;">
+                                                @foreach (var userChosen in UserSearchResults)
+                                                {
+                                                    <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
+                                                }
+                                            </ul>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="inbox_chat @((MobileMessageViewFlag ? "hidden_stuff" : ""))">
+                                    @if (RefreshConversations != null)
                                     {
-                                        <li class="list-group-item" @onclick="() => CreateUserConversation(userChosen)">@userChosen</li>
+                                        Conversations = RefreshConversations;
                                     }
-                                </ul>
-                            }
-                        </div>
-                    </div>
-                    <div class="inbox_chat @((MobileMessageViewFlag ? "hidden_stuff" : ""))">
-                        @if (RefreshConversations != null)
-                        {
-                            Conversations = RefreshConversations;
-                        }
-                        <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" @bind-MobileMessageViewFlag="MobileMessageViewFlag" @bind-RefreshConversations="RefreshConversations"/>
-                    </div>
-                </div>
-                <div class="msgs @((MobileMessageViewFlag ? "msgs_selected" : "hidden_stuff"))">
-                    @if(SelectedConversation != null && SelectedConversation.Id != 0)
-                    {
-                        var convo = Conversations.First(x => x.Id == SelectedConversation.Id);
-                        SelectedConversation = convo;
-                        MobileConvoUserString = SelectedConversation.ConversationUsers.First(x => x.UserId != _userId).User.UserName;
-                        <div class="float-parent-element">
-                            <div class="float-child-element-right  @((MobileMessageViewFlag ? "" : "hidden_stuff"))"><strong>@MobileConvoUserString</strong></div>
-                            <button class="float-child-element-left return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">&lt;=</button>
-                        </div>
-                        
-                    }
-                    <div class="msg_history flex-column-reverse" @ref=MessageRef>
-                        @if (SelectedConversation != null && SelectedConversation.Id != 0)
-                        {
-                            <DisplayMessages @ref=_displayMessages Conversation=@SelectedConversation UserId=@_userId />
-                        }
-                    </div>
+                                    <ConversationPage Conversations=@Conversations UserId=@_userId @bind-SelectedConversation="SelectedConversation" @bind-MobileMessageViewFlag="MobileMessageViewFlag" @bind-RefreshConversations="RefreshConversations"/>
+                                </div>
+                            </div>
+                            <div class="msgs @((MobileMessageViewFlag ? "msgs_selected" : "hidden_stuff"))">
+                                <div class="float-parent-element" style="height:30px;">
+                                @if(SelectedConversation != null && SelectedConversation.Id != 0)
+                                {
+                                    var convo = Conversations.First(x => x.Id == SelectedConversation.Id);
+                                    SelectedConversation = convo;
+                                    MobileConvoUserString = SelectedConversation.ConversationUsers.First(x => x.UserId != _userId).User.UserName;
+                                    
+                                        <div class="float-child-element-right  @((MobileMessageViewFlag ? "" : "hidden_stuff"))"><strong>@MobileConvoUserString</strong></div>
+                                        <button class="float-child-element-left return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">&lt;=</button>                        
+                                }
+                                </div>
+                                <div class="msg_history flex-column-reverse" @ref=MessageRef>
+                                    @if (SelectedConversation != null && SelectedConversation.Id != 0)
+                                    {
+                                        <DisplayMessages @ref=_displayMessages Conversation=@SelectedConversation UserId=@_userId />
+                                    }
+                                </div>
 
-                    <div class="type_msg @((MobileMessageViewFlag ? "" : "hidden_stuff"))">
-                        <div class="input_msg_write">
-                            <textarea type="text" class="write_msg" @onkeyup="SendMessageOnKeyPress" @bind=NewMessage placeholder="Type a message" />
-                            <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
+                                <div class="type_msg @((MobileMessageViewFlag ? "" : "hidden_stuff"))">
+                                    <div class="input_msg_write">
+                                        <textarea type="text" class="write_msg" @onkeyup="SendMessageOnKeyPress" @bind=NewMessage placeholder="Type a message" />
+                                        <button class="msg_send_btn" type="button" @onclick="@(() => SendMessage())">=></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-        </div>
+            </div>
         </div>
     </Authorized>
 
@@ -76,7 +89,7 @@
                 <h1>Hello, unauthenticated user!</h1>
                 <p>Unfortunately Chat functionality is not available for unathenticated users.</p>
                 <p>In order to authenticate and interact with others <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
-                <a href="#">Go Home</a>
+                <a href="">Go Home</a>
             </div>
         </div>
     </NotAuthorized>
@@ -222,7 +235,7 @@
 
 <style>
 
-    @@media screen and (max-width: 767px) {
+    @@media screen and (max-width: 992px) {
 
         .inbox_people {
             width: 100%!important;
@@ -250,9 +263,13 @@
             visibility: hidden!important;
             display:none!important;
         }
+
+        .hidden_stuff_with_display {
+            visibility: hidden!important;
+        }
     }
 
-    @@media screen and (min-width: 768px) {
+    @@media screen and (min-width: 993px) {
 
         .return-to-convo {
             visibility: hidden!important;
@@ -289,13 +306,12 @@
 
     .msgs {
         float: left;
-        padding: 30px 15px 0 25px;
+        padding: 10px 15px 0 25px;
         width: 60%;
         display: grid;
     }
 
     .container {
-        max-width: 1170px;
         margin: auto;
     }
 
@@ -307,6 +323,7 @@
         border: 1px solid #c4c4c4;
         clear: both;
         overflow: hidden;
+        height: 500px!important
     }
 
     .top_spac {
@@ -498,11 +515,12 @@
 
     .messaging {
         padding: 0 0 50px 0;
+        height:500px!important;
     }
 
     .msg_history {
         display: flex;
-        height: 480px;
+        height: 400px !important;
         overflow-y: auto;
     }
 
@@ -515,5 +533,10 @@
         justify-items: center;
         align-content: space-evenly;
         align-items: center;
+    }
+
+    .container {
+        justify-content: space-evenly;
+        align-content: space-evenly;
     }
 </style>
