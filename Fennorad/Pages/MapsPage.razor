@@ -5,10 +5,9 @@
 @inject IJSRuntime JsRuntime
 
 <PageTitle>Maps</PageTitle>
-
-<AuthorizeView>
-    <Authorized>
-        <div class="container">
+<div class="container">
+    <AuthorizeView>
+        <Authorized>        
             <div class="row center-stuff">
                 <div class="col-12 col-md-8">
                     @if (AccessToken != null)
@@ -22,23 +21,21 @@
                     {
                         <p>Loading Map</p>
                     }
-                    
                 </div>
             </div>
-        </div>
-        
-    </Authorized>
-    <NotAuthorized>
-        <div class="row center-stuff">
-            <div class="col-12 col-md-8">
-                <h1>Hello, unauthenticated user!</h1>
-                <p>Unfortunately Maps functionality is not available for unathenticated users</p>
-                <p>In order to authenticate and use this service <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
-                <a href="">Go Home</a>
+        </Authorized>
+        <NotAuthorized>
+            <div class="row center-stuff">
+                <div class="col-12 col-md-8">
+                    <h1>Hello, unauthenticated user!</h1>
+                    <p>Unfortunately Maps functionality is not available for unathenticated users</p>
+                    <p>In order to authenticate and use this service <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+                    <a href="">Go Home</a>
+                </div>
             </div>
-        </div>
-    </NotAuthorized>
-</AuthorizeView>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
 
 @code{
     [Inject]

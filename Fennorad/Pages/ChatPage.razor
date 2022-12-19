@@ -10,9 +10,9 @@
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
 
-<AuthorizeView>
-    <Authorized>
-        <div class="container">
+<div class="container">
+    <AuthorizeView>
+        <Authorized>
             <div class="row center-stuff">
                 <div class="col-12 col-md-8">
                     <h2>Chat Page</h2>
@@ -80,10 +80,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </Authorized>
+        
+        </Authorized>
 
-    <NotAuthorized>
+        <NotAuthorized>
         <div class="row center-stuff">
             <div class="col-12 col-md-8">
                 <h1>Hello, unauthenticated user!</h1>
@@ -92,8 +92,9 @@
                 <a href="">Go Home</a>
             </div>
         </div>
-    </NotAuthorized>
-</AuthorizeView>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
 
 
 

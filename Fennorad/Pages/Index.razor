@@ -10,90 +10,91 @@
 
 
 <PageTitle>Fennorad</PageTitle>
+<div class="container">
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <AuthorizeView>
+                <Authorized>
+                    @if(user != null)
+                    {
+                        <h1>Hello, @user.Identity.Name!</h1>
+                        <p>Thank you for joining us today</p>
+                    }
+                    else
+                    {
+                        <h1>Hello, User!</h1>
+                        <p>There are some issues with your login. Log back in to remedy the issue :)</p>
+                    }
+                </Authorized>
 
-<div class="row center-stuff">
-    <div class="col-12 col-md-8">
-        <AuthorizeView>
-            <Authorized>
-                @if(user != null)
-                {
-                    <h1>Hello, @user.Identity.Name!</h1>
-                    <p>Thank you for joining us today</p>
-                }
-                else
-                {
-                    <h1>Hello, User!</h1>
-                    <p>There are some issues with your login. Log back in to remedy the issue :)</p>
-                }
-            </Authorized>
 
-
-            <NotAuthorized>
-                        <h1>Hello, user!</h1>
-                        <p>In order to authenticate and use Chat and Maps then <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
-            </NotAuthorized>
+                <NotAuthorized>
+                            <h1>Hello, user!</h1>
+                            <p>In order to authenticate and use Chat and Maps then <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+                </NotAuthorized>
  
-        </AuthorizeView>
-        <br />
-    </div>
-    <div class="col-12 col-md-8">
-        <h5>Currently Available Functionality:</h5>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Page</th>
-                    <th scope="col">Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td><a href="chat">Chat</a></td>
-                    <td>
-                        <ul>
-                            <li>Search for users and start new convos</li>
-                            <li>Send messages back and forth between 2 users</li>
-                            <li>Unread messages result in notification of new message</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td><a href="maps">Maps</a></td>
-                    <td>
-                        <ul>
-                            <li>Allows for getting directions like other maps services</li>
-                            <li>Leverages MapBox for navigation</li>
-                            <li>Also does geolocation however not fully refined</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td><a href="youtube">Youtube</a></td>
-                    <td>
-                        <ul>
-                            <li>Allows users to search and watch youtube videos</li>
-                            <li>Allows for download of youtube videos (20MB limit)</li>
-                            <li>Choose between mp3 and mp4 format</li>
-                            <li>Might not be super legal</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">4</th>
-                    <td><a href="beautify">Beautify</a></td>
-                    <td>
-                        <ul>
-                            <li>Beautifies strings of JSON or XML</li>
-                            <li>Useful when debugging API calls locally</li>
-                            <li>Doesn't store the result of beautification</li>
-                        </ul>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            </AuthorizeView>
+            <br />
+        </div>
+        <div class="col-12 col-md-8">
+            <h5>Currently Available Functionality:</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Page</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td><a href="chat">Chat</a></td>
+                        <td>
+                            <ul>
+                                <li>Search for users and start new convos</li>
+                                <li>Send messages back and forth between 2 users</li>
+                                <li>Unread messages result in notification of new message</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td><a href="maps">Maps</a></td>
+                        <td>
+                            <ul>
+                                <li>Allows for getting directions like other maps services</li>
+                                <li>Leverages MapBox for navigation</li>
+                                <li>Also does geolocation however not fully refined</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td><a href="youtube">Youtube</a></td>
+                        <td>
+                            <ul>
+                                <li>Allows users to search and watch youtube videos</li>
+                                <li>Allows for download of youtube videos (20MB limit)</li>
+                                <li>Choose between mp3 and mp4 format</li>
+                                <li>Might not be super legal</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">4</th>
+                        <td><a href="beautify">Beautify</a></td>
+                        <td>
+                            <ul>
+                                <li>Beautifies strings of JSON or XML</li>
+                                <li>Useful when debugging API calls locally</li>
+                                <li>Doesn't store the result of beautification</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

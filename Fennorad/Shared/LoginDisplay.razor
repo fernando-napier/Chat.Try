@@ -1,4 +1,7 @@
-﻿<ul class="navbar-nav">
+﻿@using Fennorad.Models;
+@inject IJSRuntime JsRuntime
+
+<ul class="navbar-nav col-8 justify-content-center">
     <hr id="nav-vr1" style="">
     <li class="nav-item px-3">
         <NavLink @onclick="ClickNav" class="nav-link" href="" Match=NavLinkMatch.All>
@@ -27,7 +30,8 @@
     </li>
     <hr id="nav-vr2" style="width: 2px; height: inherit; margin-right:5px; margin-left:5px;">
     <hr id="nav-hr" />
-
+</ul>
+<ul class="navbar-nav col-3 justify-content-end">
     <AuthorizeView>
         <Authorized>
             <li class="nav-item px-3">
@@ -115,8 +119,12 @@
     [CascadingParameter]
     public MainLayout MainLayout { get; set; }
 
-    private void ClickNav()
+    private async Task ClickNav()
     {
-        MainLayout.AddCollapse();
+        var dimensions = await JsRuntime.InvokeAsync<WindowDimensions>("getDimensions");
+        if (dimensions.Width < 993)
+        {          
+            MainLayout.AddCollapse();
+        }
     }
 }
