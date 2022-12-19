@@ -22,18 +22,9 @@
             <hr />
         </div>
     </div>
-    <div class="row center-stuff">
-        <div class="row col-12 col-md-8" style="margin-bottom: 5px;">
-            <input class="col-12 col-md-10" disabled=@IsDownloadActive style="height: 30px; margin-bottom: 7px;" @bind=SearchQuery type="text" placeholder="input search term">
-            <div class="col-3 offset-9 col-md-2 offset-md-0" style="margin-bottom: 25px; height: 30px; padding-right:0px!important">
-                <button class="float-right" disabled=@IsDownloadActive @onclick="SearchForVideos">Search</button>
-            </div>
-        </div>
-        
-    </div>
 
-@if (Videos.Any())
-{
+    @if (Videos.Any())
+    {
         var count = Videos.Count;
         <div class="row center-stuff" style="margin-bottom: 25px;">
             <div id="myCarousel" class="carousel slide col-12 col-md-8">
@@ -54,9 +45,27 @@
                     <option value="audio">Download Audio</option>
                 </select>
             </div>
+        </div>
+    }
+    else
+    {
+        <div class="row center-stuff">
+            <div class="row col-12 col-md-8" style="margin-bottom: 5px;">
+                <div class="embed-container">
+                    <iframe src="https://www.youtube.com/embed/1i-b9-q8Vvs?&enablecastapi=1" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row center-stuff">
+        <div class="row col-12 col-md-8" style="margin-bottom: 5px;">
+            <input class="col-12 col-md-10" disabled=@IsDownloadActive style="height: 30px; margin-bottom: 7px;" @bind=SearchQuery type="text" placeholder="input search term">
+            <div class="col-3 offset-9 col-md-2 offset-md-0" style="margin-bottom: 25px; height: 30px; padding-right:0px!important">
+                <button class="float-right" disabled=@IsDownloadActive @onclick="SearchForVideos">Search</button>
+            </div>
+        </div>
     </div>
-    
-}
 
 
 <br />
