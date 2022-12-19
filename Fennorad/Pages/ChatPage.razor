@@ -59,8 +59,8 @@
                                     MobileConvoUserString = SelectedConversation.ConversationUsers.First(x => x.UserId != _userId).User.UserName;
                                     
                                         <div class="float-child-element-right  @((MobileMessageViewFlag ? "" : "hidden_stuff"))"><strong>@MobileConvoUserString</strong></div>
-                                        <button class="float-child-element-left return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo">&lt;=</button>                        
-                                }
+                                        <button class="float-child-element-left return_to_convo @((!MobileMessageViewFlag ? "hidden_stuff" : ""))" @onclick="FlipReturnToConvo"><span class="oi oi-chevron-left" style="top:3px;" aria-hidden="true"></span></button>
+                                    }
                                 </div>
                                 <div class="msg_history flex-column-reverse" @ref=MessageRef>
                                     @if (SelectedConversation != null && SelectedConversation.Id != 0)
