@@ -17,20 +17,20 @@
                 <Authorized>
                     @if(user != null)
                     {
-                        <h1>Hello, @user.Identity.Name!</h1>
+                        <h2>Hello, @user.Identity.Name!</h2>
                         <p>Thank you for joining us today</p>
                     }
                     else
                     {
-                        <h1>Hello, User!</h1>
+                        <h2>Hello, User!</h2>
                         <p>There are some issues with your login. Log back in to remedy the issue :)</p>
                     }
                 </Authorized>
 
 
                 <NotAuthorized>
-                            <h1>Hello, user!</h1>
-                            <p>In order to authenticate and use Chat and Maps then <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+                            <h2>Hello, user!</h2>
+                            <p>In order to authenticate and use the Chat functionality then <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
                 </NotAuthorized>
  
             </AuthorizeView>
@@ -74,7 +74,7 @@
                         <td><a href="youtube">Youtube</a></td>
                         <td>
                             <ul>
-                                <li>Allows users to search and watch youtube videos</li>
+                                <li>Allows users to search, watch, and cast youtube videos</li>
                                 <li>Allows for download of youtube videos (20MB limit)</li>
                                 <li>Choose between mp3 and mp4 format</li>
                                 <li>Might not be super legal</li>
