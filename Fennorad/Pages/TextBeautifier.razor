@@ -47,22 +47,25 @@
     {
         <div class="row center-stuff" style="margin-top:15px;">
             <div class="col-12 col-md-8">
-                <textarea disabled=true type="text" class="text-area" placeholder="@PrettyJson" />
+                <textarea readonly type="text" class="text-area" value="@PrettyJson" />
                 <button class="@(CopySuccess ? "bg-info": "")" @onclick="CopyContents">Copy To Clipboard</button>
             </div>
         </div>
     }
 
-</div>
-
 @if(!string.IsNullOrEmpty(InvalidJson))
 {
-    <div class="row">
-        <div class="col-12 col-md-6 bg-warning">
-            <p>@InvalidJson</p>
+    <div class="row center-stuff" style="margin-top:15px;">
+        <div class="col-12 col-md-8">
+            <div class="col-12 col-md-6 bg-warning">
+                <p>@InvalidJson</p>
+            </div>
         </div>
-    </div>    
+    </div>
 }
+
+</div>
+
 
 
 
