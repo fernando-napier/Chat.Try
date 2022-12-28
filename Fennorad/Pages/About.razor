@@ -1,0 +1,109 @@
+﻿@page "/about"
+@using Blazorise
+@inject IJSRuntime JsRuntime
+
+<PageTitle>About</PageTitle>
+<div class="container">
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <h2>About</h2>
+            <p>This page gives you information about the intent of this site</p>
+            <hr />
+        </div>
+    </div>
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+                <Items>
+                    <Tab Name="site">Site</Tab>
+                    <Tab Name="chat">Chat</Tab>
+                    <Tab Name="maps">Maps</Tab>
+                    <Tab Name="youtube">Youtube</Tab>
+                    <Tab Name="beautify">Beautify</Tab>
+                </Items>
+                <Content>
+                    <TabPanel Name="site">
+                        <dl class="row" style="margin-top:10px;">
+                            <dt class="col-sm-3">Technology Used</dt>
+                            <dd class="col-sm-9">Blazor Server, DotNet 6, Razor Pages, EFCore, Sql Server, C#, Javascript, HTML, CSS</dd>
+                            <dt class="col-sm-3">User Profiles</dt>
+                            <dd class="col-sm-9">This was accomplished by leveraging Microsoft Identity</dd>
+                            <dt class="col-sm-3">Contiunous Deployment</dt>
+                            <dd class="col-sm-9">Github Actions is used to deploy changes to the main branch of the project as well as database changes<a href="https://github.com/fernando-napier/Fennorad/actions">link</a></dd>
+                            <dt class="col-sm-3">Responsive UI</dt>
+                            <dd class="col-sm-9">Bootstrap 5 is leveraged to style the UI and allow for responsive design that works on mobile and desktop.</dd>
+                            <dt class="col-sm-3">Why Blazor?</dt>
+                            <dd class="col-sm-9">Blazor is similar to React in terms of how components can be self contained and exported. It was a logical first step for me to venture into site building with a familiar C# background. </dd>
+                        </dl>
+                    </TabPanel>
+                    <TabPanel Name="chat">
+                        <dl class="row" style="margin-top:10px;">
+                            <dt class="col-sm-3">Overview</dt>
+                            <dd class="col-sm-9">Allows users to connect and have conversations</dd>
+                            <dt class="col-sm-3">SQL Server</dt>
+                            <dd class="col-sm-9">This particular piece of the project involved heavy SQL involvement. There are 5 tables leveraged for keeping track of user conversations, message history, and read receipts. DbUp is used to update the database tables to have some version control over changes.</dd>
+                            <dt class="col-sm-3">UI</dt>
+                            <dd class="col-sm-9">This page has the most UI heavy logic which includes: Collapsing the chat container for mobile, updating UI when messages have been received and then subsequently read, user search returning results instantaneously</dd>
+                            <dt class="col-sm-3">How are new messages received?</dt>
+                            <dd class="col-sm-9">There is a 15 second timer that gathers new messages for every user conversation. If a user has new messages the conversation tile will flash to indicate new messages. Once new messages are read then the conversation will no longer flash</dd>
+                        </dl>
+                    </TabPanel>
+                    <TabPanel Name="maps">
+                        <dl class="row" style="margin-top:10px;">
+                            <dt class="col-sm-3">Overview</dt>
+                            <dd class="col-sm-9">This is an integration with Mapbox API that allows for users to get directions.</dd>
+                            <dt class="col-sm-3">Fennorad.Mapbox</dt>
+                            <dd class="col-sm-9">Mapbox API that has javascript libraries you can integrate with. Fennorad.Mapbox is a library I created to allow for easy integration with the Directions API within Mapbox as a Blazor component</dd>
+                        </dl>
+                    </TabPanel>
+                    <TabPanel Name="youtube">
+                        <dl class="row" style="margin-top:10px;">
+                            <dt class="col-sm-3">Overview</dt>
+                            <dd class="col-sm-9">This page allows users to search, watch, and download youtube videos.</dd>
+                            <dt class="col-sm-3">Youtube Download</dt>
+                            <dd class="col-sm-9">This leverages the youtube-dl project to be able to gather and download youtube videos. This meant I needed to ensure python was installed and working within my deployment environment. This allows for either mp4 or mp3 download.</dd>
+                            <dt class="col-sm-3">Embedded Videos</dt>
+                            <dd class="col-sm-9">Youtube allows for embedding youtube videos plus I enabled casting (doesn't work on mobile)</dd>
+                        </dl>
+                    </TabPanel>
+                    <TabPanel Name="beautify">
+                        <dl class="row" style="margin-top:10px;">
+                            <dt class="col-sm-3">Overview</dt>
+                            <dd class="col-sm-9">This page allows users to take JSON/XML strings and makes them pretty.</dd>
+                            <dt class="col-sm-3">Why does this matter?</dt>
+                            <dd class="col-sm-9">I work with 3rd party APIs and when dealing with responses from code causes the returned objects to be minified. It helps to format the JSON/XML objects into a palatable format to properly asses the objects.</dd>
+                        </dl>
+                    </TabPanel>
+                </Content>
+            </Tabs>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .center-stuff {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+
+    .container {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+</style>
+
+@code {
+    string selectedTab = "site";
+
+    private Task OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+
+        return Task.CompletedTask;
+    }
+}

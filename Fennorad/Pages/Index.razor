@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Security.Claims
+@using Blazorise
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager;
@@ -36,64 +37,58 @@
             </AuthorizeView>
             <br />
         </div>
-        <div class="col-12 col-md-8">
-            <h5>Currently Available Functionality:</h5>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Page</th>
-                        <th scope="col">Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td><a href="chat">Chat</a></td>
-                        <td>
-                            <ul>
-                                <li>Search for users and start new convos</li>
-                                <li>Send messages back and forth between 2 users</li>
-                                <li>Unread messages result in notification of new message</li>
-                            </ul>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td><a href="maps">Maps</a></td>
-                        <td>
-                            <ul>
-                                <li>Allows for getting directions like other maps services</li>
-                                <li>Leverages MapBox for navigation</li>
-                                <li>Also does geolocation however not fully refined</li>
-                            </ul>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td><a href="youtube">Youtube</a></td>
-                        <td>
-                            <ul>
-                                <li>Allows users to search, watch, and cast youtube videos</li>
-                                <li>Allows for download of youtube videos (20MB limit)</li>
-                                <li>Choose between mp3 and mp4 format</li>
-                                <li>Might not be super legal</li>
-                            </ul>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">4</th>
-                        <td><a href="beautify">Beautify</a></td>
-                        <td>
-                            <ul>
-                                <li>Beautifies strings of JSON or XML</li>
-                                <li>Useful when debugging API calls locally</li>
-                                <li>Doesn't store the result of beautification</li>
-                            </ul>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="row center-stuff">
+            <div class="col-12 col-md-8">
+                <h3>Currently Available Functionality</h3>
+                <Carousel Crossfade=true Interval=10000 Style="height:400px;" @bind-SelectedSlide=@SelectedSlide >
+                    <CarouselSlide Name="1">
+                        <Card>
+                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/26FPJGjhefSJuaRhu/giphy.gif" Alt="chat.gif"></CardImage>
+                            <hr />
+                            <CardBody>
+                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="chat" Target="Target.Parent">Go To Chat</Button></CardTitle>
+                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                    This page allows users to chat with other users and stores conversations. Login to try it out. (User: example-user Password: password)
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                    </CarouselSlide>
+                    <CarouselSlide Name="2">
+                        <Card>
+                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/ildLrpK7sOV9ky6NOf/giphy.gif" Alt="maps.gif"></CardImage>
+                            <CardBody>
+                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="maps" Target="Target.Parent">Go To Maps</Button></CardTitle>
+                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                    This is a navigation page that allows for a user to get directions from one place to another.
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                    </CarouselSlide>
+                    <CarouselSlide Name="3">
+                        <Card>
+                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/13Nc3xlO1kGg3S/giphy.gif" Alt="youtube.gif"></CardImage>
+                            <hr />
+                            <CardBody>
+                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="youtube" Target="Target.Parent">Go To Youtube</Button></CardTitle>
+                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                    This is a page that allows you to search for, play, cast, and download videos (mp3 or mp4).
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                    </CarouselSlide>
+                    <CarouselSlide Name="4">
+                        <Card>
+                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/3oEjHWbXcpeKhTktXi/giphy.gif" Alt="beautify.gif"></CardImage>
+                            <CardBody>
+                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="beautify" Target="Target.Parent">Go To Beautify</Button></CardTitle>
+                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                    This page allows you to paste either JSON or XML and return a pretty print version of the object.
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                    </CarouselSlide>
+                </Carousel>
+            </div>
         </div>
     </div>
 </div>
@@ -105,11 +100,22 @@
         align-content: space-evenly;
         align-items: center;
     }
+
+    .carousel-control-next, .carousel-control-prev {
+        height: 30px;
+        width: 20px;
+        position: absolute;
+        top: 50%;
+        background-color: darkslategray;
+    }
+
 </style>
 
 @code{
 
     private ClaimsPrincipal user { get; set; }
+
+    private string SelectedSlide = "1";
 
     protected override async Task OnInitializedAsync()
     {
