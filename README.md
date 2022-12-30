@@ -1,13 +1,29 @@
 <h2> Fennorad </h2>
 
 <h3> Introduction </h3>
-This is a blazor server project built with DotNet6, Sql Server, Blazor/Razor pages, Microsoft Identity, CSS, HTML, some javascript. This project also leverages Github Actions for building and deploying the application as well as deploying database changes. The application and database are hosted on my personal Azure account.
+This is a project that started out as a Blazor Server application to have more experience working with a UI but now has transformed.
+
+<details>
+  <summary>Dotnet & React project</summary>
 
 <h3> Getting Started </h3>
+This is a project created with a React frontend, DotNet6 backend, Sql Server, Microsoft Identity, CSS, HTML. This is deployed manually to SmarterAsp.Net.
+To access the website go to https://fennorad.com/ 
+
+This site is under construction but I wanted to fully deploy an application 
+
+
+<details>
+
+<details>
+  <summary>Blazor Server project</summary>
+
+<h3> Getting Started </h3>
+This is a blazor server project built with DotNet6, Sql Server, Blazor/Razor pages, Microsoft Identity, CSS, HTML, some javascript. This project also leverages Github Actions for building and deploying the application as well as deploying database changes. The application and database are hosted on my personal Azure account.
 To access the website go to https://fennorad.azurewebsites.net/ and create an account or use the example user:
 
 User: `example-user`  
-Password: `password`  
+Password: `password` 
 
 
 <h3>Functionality of the project</h3>
@@ -43,3 +59,5 @@ https://fennorad.azurewebsites.net/youtube
 2) videos are embedded so users can also just watch the video on this site
 3) Leverages the `YoutubeDLSharp` library for downloading youtube videos and the `BlazorDownloadFileFast` libary for client side downloading.
 4) This is unlisted to unauthenticated users but can still be accessed.
+
+</details>
