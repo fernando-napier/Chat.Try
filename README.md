@@ -12,8 +12,7 @@ To access the website go to https://fennorad.com/
 
 This site is under construction but I wanted to fully deploy an application 
 
-
-<details>
+</details>
 
 <details>
   <summary>Blazor Server project</summary>
