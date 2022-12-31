@@ -12,6 +12,9 @@ To access the website go to https://fennorad.com/
 
 This site is under construction but I wanted to fully deploy an application.
 
+
+<h3>Functionality of the project</h3>
+
 <h4> Wordle </h4>  
 https://fennorad.com/wordle
 
