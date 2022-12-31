@@ -1,9 +1,11 @@
-<h2> Fennorad </h2>
+<h1> Fennorad </h1>
 
 <h3> Introduction </h3>
-This is a project that started out as a Blazor Server application to have more experience working with a UI but now has transformed.
+This is a project that started out as a Blazor Server application to have more experience working with a UI but now has transformed. <br>
   
-<br>  
+      
+<h2> Deployed Projects </h2>
+  
   
 <details>
   <summary>Dotnet & React project</summary>
