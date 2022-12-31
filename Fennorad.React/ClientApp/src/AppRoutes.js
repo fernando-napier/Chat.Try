@@ -9,7 +9,7 @@ const AppRoutes = [
     element: <Home />
   },
   {
-    path: '/fetch-data',
+    path: '/weather',
     element: <FetchData />
   },
   {
