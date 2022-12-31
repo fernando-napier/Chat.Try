@@ -3,6 +3,8 @@
 <h3> Introduction </h3>
 This is a project that started out as a Blazor Server application to have more experience working with a UI but now has transformed.
 
+  
+  
 <details>
   <summary>Dotnet & React project</summary>
 
