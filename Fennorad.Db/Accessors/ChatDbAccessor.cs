@@ -2,8 +2,9 @@
 using Fennorad.Db.Models;
 using Fennorad.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Fennorad.Accessors
+namespace Fennorad.Db.Accessors
 {
     public interface IChatDbAccessor
     {

@@ -3,8 +3,8 @@
 @using System.Security.Claims
 @using Microsoft.EntityFrameworkCore;
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject Fennorad.Accessors.IChatDbAccessor _chatDbAccessor
-@inject Fennorad.Accessors.IUserDbAccessor _userDbAccessor
+@inject Fennorad.Db.Accessors.IUserDbAccessor _userDbAccessor
+@inject Fennorad.Db.Accessors.IChatDbAccessor _chatDbAccessor
 @inject NavigationManager _navigation
 @inject IJSRuntime JsRuntime
 

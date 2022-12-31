@@ -2,9 +2,8 @@ using BlazorChat;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
-using Fennorad.Accessors;
 using Fennorad.Areas.Identity;
-using Fennorad.Data;
+using Fennorad.Db.Accessors;
 using Fennorad.Db.Context;
 using Fennorad.Models;
 using Google.Apis.Services;
@@ -14,7 +13,6 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +30,7 @@ builder.Services.AddScoped<Configuration>(opt =>
 builder.Services.AddScoped<IUserDbAccessor, UserDbAccessor>();
 builder.Services.AddScoped<IChatDbAccessor, ChatDbAccessor>();
 var connectionString = builder.Configuration.GetConnectionString("Chat");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<Fennorad.Db.Context.ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<ChatContext>(options =>
     options.UseSqlServer(connectionString));
@@ -40,7 +38,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
-}).AddEntityFrameworkStores<ApplicationDbContext>();
+}).AddEntityFrameworkStores<Fennorad.Db.Context.ApplicationDbContext>();
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireDigit = false;

@@ -1,0 +1,11 @@
+﻿.center-stuff {
+    justify-content: space-evenly;
+    justify-items: center;
+    align-content: space-evenly;
+    align-items: center;
+}
+
+.container {
+    justify-content: space-evenly;
+    align-content: space-evenly;
+}

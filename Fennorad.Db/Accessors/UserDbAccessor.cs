@@ -1,7 +1,7 @@
-﻿using Fennorad.Data;
+﻿using Fennorad.Db.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Fennorad.Accessors
+namespace Fennorad.Db.Accessors
 {
     public interface IUserDbAccessor
     {
