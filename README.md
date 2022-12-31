@@ -10,7 +10,7 @@ This is a project that started out as a Blazor Server application to have more e
 This is a project created with a React frontend, DotNet6 backend, Sql Server, Microsoft Identity, CSS, HTML. This is deployed manually to SmarterAsp.Net.
 To access the website go to https://fennorad.com/ 
 
-This site is under construction but I wanted to fully deploy an application 
+This site is under construction but I wanted to fully deploy an application .
 
 </details>
 

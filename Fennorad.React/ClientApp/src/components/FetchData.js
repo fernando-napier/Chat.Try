@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './Container.css';
 
 export class FetchData extends Component {
   static displayName = FetchData.name;
@@ -13,7 +14,8 @@ export class FetchData extends Component {
   }
 
   static renderForecastsTable(forecasts) {
-    return (
+      return (
+        
       <table className='table table-striped' aria-labelledby="tabelLabel">
         <thead>
           <tr>
@@ -42,12 +44,15 @@ export class FetchData extends Component {
       ? <p><em>Loading...</em></p>
       : FetchData.renderForecastsTable(this.state.forecasts);
 
-    return (
-      <div>
-        <h1 id="tabelLabel" >Weather forecast</h1>
-        <p>This component demonstrates fetching data from the server.</p>
-        {contents}
+      return (
+        <div class="row center-stuff">
+            <div class="col-12 col-md-8">
+                <h2 id="tabelLabel" >Weather forecast</h2>
+                <p>This component demonstrates fetching data from the server.</p>
+                {contents}
+            </div>
       </div>
+
     );
   }
 
