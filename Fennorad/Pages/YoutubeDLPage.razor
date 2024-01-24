@@ -272,6 +272,7 @@
             var ytdlProc = new YoutubeDLProcess();
             ytdlProc.PythonPath = Config.PythonPath;
             ytdlProc.ExecutablePath = Config.YoutubeDLPath;
+
             // capture the standard output and error output
             ytdlProc.OutputReceived += async (o, e) =>
             {
@@ -301,6 +302,7 @@
                 {
                     Output = filename,
                     MaxFilesize = "20.0m",
+                    FfmpegLocation = Config.FfmpegPath,
                 };
 
             if (mp3Flag)
