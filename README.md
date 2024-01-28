@@ -2,31 +2,9 @@
 
 <h3> Introduction </h3>
 This is a project that started out as a Blazor Server application to have more experience working with a UI but now has transformed. <br>
-  
+<h4> Update 1/27/24: fennorad.com (Dotnet/React project) is no longer active. fennorad.azurewebsites.net (Blazor Server) is still live. </h4>
       
 <h2> Deployed Projects </h2>
-  
-  
-<details>
-  <summary>Dotnet & React project</summary>
-
-<h3> Getting Started </h3>
-This is a project created with a React frontend, DotNet6 backend, Sql Server, Microsoft Identity, CSS, HTML. This is deployed manually to SmarterAsp.Net.
-To access the website go to https://fennorad.com/ 
-
-This site is under construction but I wanted to fully deploy an application.
-
-
-<h3>Functionality of the project</h3>
-
-<h4> Wordle </h4>  
-https://fennorad.com/wordle
-
-1) I found a react project that has a wordle component to import
-2) Created the npm package `fennorad-wordle` based on that project since no npm deploys were available for it
-3) This is still under construction but the basic functionality is there.
-
-</details>
 
 <details>
   <summary>Blazor Server project</summary>
@@ -72,5 +50,25 @@ https://fennorad.azurewebsites.net/youtube
 2) videos are embedded so users can also just watch the video on this site
 3) Leverages the `YoutubeDLSharp` library for downloading youtube videos and the `BlazorDownloadFileFast` libary for client side downloading.
 4) This is unlisted to unauthenticated users but can still be accessed.
+
+</details>
+
+<details>
+  <summary>Dotnet & React project</summary>
+
+<h3> Getting Started </h3>
+This is a project created with a React frontend, DotNet6 backend, Sql Server, Microsoft Identity, CSS, HTML.
+
+This site is under construction but I wanted to fully deploy an application.
+
+
+<h3>Functionality of the project</h3>
+
+<h4> Wordle </h4>  
+https://fennorad.com/wordle
+
+1) I found a react project that has a wordle component to import
+2) Created the npm package `fennorad-wordle` based on that project since no npm deploys were available for it
+3) This is still under construction but the basic functionality is there.
 
 </details>
