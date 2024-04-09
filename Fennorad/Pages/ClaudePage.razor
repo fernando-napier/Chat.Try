@@ -235,8 +235,8 @@
 
     private async Task SendMessageOnKeyPress(KeyboardEventArgs e)
     {
-        if (e.Code == "Enter" || e.Code == "NumpadEnter")
-        {
+        if (e.Key == "Enter" || e.Code == "Enter" || e.Code == "NumpadEnter")
+    {
             IsAwaitingResponse = true;
             await Task.Delay(1);
 
