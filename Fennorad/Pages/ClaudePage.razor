@@ -1,0 +1,321 @@
+﻿@page "/claude"
+@using System.Diagnostics;
+@using System.Text;
+@using Blazor.DownloadFileFast.Interfaces;
+@using System.Text.RegularExpressions;
+@using Fennorad.Models;
+@using YoutubeDLSharp;
+@using YoutubeDLSharp.Options;
+@using System;
+@using Newtonsoft.Json.Linq;
+@using Newtonsoft.Json;
+@using System.Xml;
+@using System.Xml.Linq;
+@inject IJSRuntime JsRuntime
+
+<div class="container">
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <h2>Chat with Claude</h2>
+            <p>In this page you can chat with Anthropic's Claude Generative AI.</p>
+            <hr />
+        </div>
+    </div>    
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <div id="claude_messages" class="msg_history flex-column">
+                @foreach (var message in MessageList)
+                {
+                    @if (message.IsFromClaude)
+                    {
+                        <div class="incoming_msg">
+                            <div class="received_msg">
+                                <div class="received_withd_msg">
+                                    <p class="pre-wrap">
+                                        @message.Message
+                                    </p>
+                                    <span class="time_date"> @message?.CreatedOn.ToString("MM/dd/yy HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="outgoing_msg">
+                            <div class="sent_msg">
+                                <div class="sent_withd_msg">
+                                    <p>
+                                        @message.Message
+                                    </p>
+                                    <span class="time_date"> @message?.CreatedOn.ToString("MM/dd/yy HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>   
+        </div>
+    </div>
+
+    @if(IsAwaitingResponse)
+    {
+        <div class="row center-stuff">
+            <div class="col-12 col-md-8">
+                <div class="loading">Loading</div>
+            </div>
+        </div>
+    }
+           
+            
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <textarea type="text" class="text-area" @onkeydown="SendMessageOnKeyPress" @bind:event="oninput" @bind=NewMessage placeholder="Type a message" />
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<style>
+    .time_date {
+        color: #747474;
+        display: block;
+        font-size: 12px;
+        margin: 8px 0 0;
+    }
+
+    .sent_withd_msg p {
+        background: #05728f none repeat scroll 0 0;
+        border-radius: 3px;
+        font-size: 14px;
+        margin: 0;
+        color: #fff;
+        padding: 5px 10px 5px 12px;
+        width: 100%;
+    }
+
+    .sent_msg p {
+        display: inline-block;
+        padding: 0 0 0 10px;
+        vertical-align: top;
+        width: 92%;
+    }
+
+    .sent_msg {
+        float: right;
+        width: 60%;
+    }
+    
+    .outgoing_msg {
+        margin: 26px 0 26px;
+    }
+
+    .received_withd_msg p {
+        background: #ebebeb none repeat scroll 0 0;
+        border-radius: 3px;
+        color: #646464;
+        font-size: 14px;
+        margin: 0;
+        padding: 5px 10px 5px 12px;
+        width: 100%;
+    }
+
+    .received_msg {
+        display: inline-block;
+        padding: 0 0 0 10px;
+        vertical-align: top;
+        width: 92%;
+    }
+
+    .incoming_msg {
+        margin: 26px 0 26px;
+    }
+
+    .received_withd_msg {
+        width: 100%;
+    }
+
+    .float-right {
+        float: right;
+    }
+
+    .center-stuff {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+
+    .container {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+
+    .fixed-height {
+        height: 39px;
+    }
+
+    .text-area {
+        resize: vertical;
+        width: 100%;
+    }
+
+    .float-parent-element {
+        width: 100%;
+        display: block;
+    }
+
+    .float-child-element-left {
+        float: left;
+        width: 50% !important;
+    }
+
+    .float-child-element-right {
+        margin-left: 10px;
+        float: left;
+        width: 35px !important;
+    }
+
+    .msg_history {
+        display: flex;
+        max-height: 400px;
+        overflow-y: scroll;
+    }
+
+    .received_msg {
+        display: inline-block;
+        padding: 0 0 0 10px;
+        vertical-align: top;
+        width: 92%;
+    }
+
+    .pre-wrap {
+        white-space: pre-wrap;
+    }
+
+    .loading {
+      font-size: 15px;
+    }
+
+    .loading:after {
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: bottom;
+      -webkit-animation: ellipsis steps(4,end) 900ms infinite;      
+      animation: ellipsis steps(4,end) 900ms infinite;
+      content: "\2026"; /* ascii code for the ellipsis character */
+      width: 0px;
+    }
+
+    @@keyframes ellipsis {
+      to {
+        width: 1.25em;    
+      }
+    }
+
+    @@-webkit-keyframes ellipsis {
+      to {
+        width: 1.25em;    
+      }
+    }
+</style>
+
+@code {
+
+    [Inject]
+    private IHttpClientFactory HttpClientFactory { get; set; }
+
+    private List<ClaudeMessage> MessageList = new();
+    private string NewMessage { get; set; }
+    private bool IsAwaitingResponse { get; set; }
+
+    private async Task SendMessageOnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            IsAwaitingResponse = true;
+            await Task.Delay(1);
+
+            await SendMessage();
+
+            IsAwaitingResponse = false;
+            StateHasChanged();
+            await Task.Delay(200);
+            await JsRuntime.InvokeVoidAsync("scrollToBottomOfDiv");
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(NewMessage))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Add a Message");
+            return;
+        }
+
+        MessageList.Add(new ClaudeMessage
+            {
+                CreatedOn = DateTimeOffset.Now,
+                IsFromClaude = false,
+                Message = NewMessage
+            });
+        NewMessage = string.Empty;
+        StateHasChanged();
+
+        await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("scrollToBottomOfDiv");
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("anthropic");
+            var request = new AnthropicRequest
+                {
+                    MaxTokens = 2000,
+                    Model = "claude-3-haiku-20240307",
+                    Messages = MessageList.Select(x => new AnthropicMessage
+                    {
+                        Role = x.IsFromClaude ? "assistant" : "user",
+                        Content = x.Message,
+                    }).ToList(),
+                };
+            var requestString = JsonConvert.SerializeObject(request);
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/messages")
+                {
+                    Content = new StringContent(requestString, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"))
+                };
+
+            var response = await client.SendAsync(httpRequest);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                await JsRuntime.InvokeVoidAsync("alert", $"Message failed to send, retry. Error: {content}");
+                return;
+            }
+
+            var anthropicRepsonse = JsonConvert.DeserializeObject<AnthropicResponse>(await response.Content.ReadAsStringAsync());
+
+            MessageList.Add(new ClaudeMessage
+                {
+                    IsFromClaude = true,
+                    Message = anthropicRepsonse.Content.First().Text,
+                    CreatedOn = DateTimeOffset.Now
+                });
+
+            if (anthropicRepsonse.Usage.InputTokens > 1000)
+            {
+                MessageList.RemoveAt(0);
+                MessageList.RemoveAt(0);
+            }
+        } 
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
