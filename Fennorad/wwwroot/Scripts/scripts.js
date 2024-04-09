@@ -19,6 +19,11 @@ function scrollWindowToBottom() {
     window.scrollTo(0, height);
 }
 
+function scrollToBottomOfDiv() {
+    var objDiv = document.getElementById("claude_messages");
+    objDiv.scrollTop = objDiv.scrollHeight;
+}
+
 function getPosition() {
     // Simple wrapper
     return new Promise((res, rej) => {

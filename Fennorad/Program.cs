@@ -13,10 +13,11 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<Configuration>(opt =>
+builder.Services.AddSingleton<Configuration>(opt =>
 {
     return new Configuration
     {
@@ -24,6 +25,9 @@ builder.Services.AddScoped<Configuration>(opt =>
         YoutubeDLPath = builder.Configuration.GetValue<string>("YoutubeDLPath"),
         MapAccessToken = builder.Configuration.GetValue<string>("MapAccessToken"),
         FfmpegPath = builder.Configuration.GetValue<string>("FfmpegPath"),
+        AnthropicBaseAddress = builder.Configuration.GetValue<string>("AnthropicBaseAddress"),
+        AnthropicApiKey = builder.Configuration.GetValue<string>("AnthropicApiKey"),
+        AnthropicVersion = builder.Configuration.GetValue<string>("AnthropicVersion")
     };
 });
 
@@ -60,6 +64,15 @@ builder.Services.AddScoped<IHostEnvironmentAuthenticationStateProvider>(sp => {
     //     the `RevalidatingIdentityAuthenticationStateProvider` extends the `ServerAuthenticationStateProvider`
     var provider = (ServerAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>();
     return provider;
+});
+builder.Services.AddHttpClient("anthropic", (serviceProvider, client) =>
+{
+    var config = serviceProvider
+        .GetRequiredService<Configuration>();
+    client.DefaultRequestHeaders.Add("x-api-key", config.AnthropicApiKey);
+    client.DefaultRequestHeaders.Add("anthropic-version", config.AnthropicVersion);
+
+    client.BaseAddress = new Uri(config.AnthropicBaseAddress);
 });
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

@@ -16,6 +16,7 @@
             <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
                 <Items>
                     <Tab Name="site">Site</Tab>
+                    <Tab Name="claude">Claude</Tab>
                     <Tab Name="chat">Chat</Tab>
                     <Tab Name="maps">Maps</Tab>
                     <Tab Name="youtube">Youtube</Tab>
@@ -34,6 +35,16 @@
                             <dd class="col-sm-9">Bootstrap 5 is leveraged to style the UI and allow for responsive design that works on mobile and desktop.</dd>
                             <dt class="col-sm-3">Why Blazor?</dt>
                             <dd class="col-sm-9">Blazor is similar to React in terms of how components can be self contained and exported. It was a logical first step for me to venture into site building with a familiar C# background. </dd>
+                        </dl>
+                    </TabPanel>
+                    <TabPanel Name="claude">
+                        <dl class="row" style="margin-top:10px;">
+                            <dt class="col-sm-3">Overview</dt>
+                            <dd class="col-sm-9">Chat with Claude a generative AI</dd>
+                            <dt class="col-sm-3">Api Integration</dt>
+                            <dd class="col-sm-9">Claude is served via an API by Anthropic. They have libraries for Python and Typescript but don't for C#. This was integrated via manually generated HttpClient requests.</dd>
+                            <dt class="col-sm-3">UI</dt>
+                            <dd class="col-sm-9">This page borrows UI elements from the other Chat tab but much less logic</dd>
                         </dl>
                     </TabPanel>
                     <TabPanel Name="chat">
