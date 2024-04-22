@@ -22,86 +22,104 @@
             <hr />
         </div>
     </div>
-
-    @if (Videos.Any())
-    {
-        var count = Videos.Count;
-        <div class="row center-stuff" style="margin-bottom: 25px;">
-            <div id="myCarousel" class="carousel slide col-12 col-md-8">
-                <Carousel @bind-SelectedSlide=@ChosenVideoId Autoplay="false" AutoRepeat="false">
-                    @for (int i = 0; i < count; i++)
-                    {
-                        var video = Videos.ElementAt(i);
-                        <CarouselSlide Name=@i.ToString()>
-                            <div class="embed-container">
-                                <iframe id=@video.VideoId src="https://www.youtube.com/embed/@video.VideoId?&enablecastapi=1" allowfullscreen></iframe>
+    <div class="row center-stuff" style="margin-bottom: 25px;">
+        <div class="col-12 col-md-8">
+            <Tabs SelectedTab="@SelectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+                <Items>
+                    <Tab Name="search">Search and Download</Tab>
+                    <Tab Name="url">Download via Url</Tab>
+                </Items>
+                <Content>
+                    <TabPanel Name="search">
+                        @if (Videos.Any())
+                        {
+                            var count = Videos.Count;
+                            <div class="row center-stuff" style="margin-bottom: 25px;">
+                                <div id="myCarousel" class="carousel slide">
+                                    <Carousel @bind-SelectedSlide=@ChosenVideoId Autoplay="false" AutoRepeat="false">
+                                        @for (int i = 0; i < count; i++)
+                                        {
+                                            var video = Videos.ElementAt(i);
+                                            <CarouselSlide Name=@i.ToString()>
+                                                <div class="embed-container">
+                                                    <iframe id=@video.VideoId src="https://www.youtube.com/embed/@video.VideoId?&enablecastapi=1" allowfullscreen></iframe>
+                                                </div>
+                                            </CarouselSlide>
+                                        }
+                                    </Carousel>
+                                    <select disabled=@(IsDownloadActive) id="downloadOptions" name="downloadOptions" @onchange=DownloadStuff class="form-select" aria-label="Default select example">
+                                        <option selected>Donwload Options</option>
+                                        <option value="video">Download Video</option>
+                                        <option value="audio">Download Audio</option>
+                                    </select>
+                                </div>
                             </div>
-                        </CarouselSlide>
-                    }
-                </Carousel>
-                <select disabled=@(IsDownloadActive) id="downloadOptions" name="downloadOptions" @onchange=DownloadStuff class="form-select" aria-label="Default select example">
-                    <option selected>Donwload Options</option>
-                    <option value="video">Download Video</option>
-                    <option value="audio">Download Audio</option>
-                </select>
-            </div>
+                        }
+                        else
+                        {
+                            <div class="row center-stuff">
+                                <div class="row" style="margin-bottom: 5px;">
+                                    <div class="embed-container">
+                                        <iframe src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" allowfullscreen></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="row center-stuff">
+                            <div class="row col-12 col-md-8" style="margin-bottom: 5px;">
+                                <input class="col-12 col-md-10" disabled=@IsDownloadActive style="height: 30px; margin-bottom: 7px;" @bind=SearchQuery type="text" placeholder="input search term">
+                                <div class="col-3 offset-9 col-md-2 offset-md-0" style="margin-bottom: 25px; height: 30px; padding-right:0px!important">
+                                    <button class="float-right" disabled=@IsDownloadActive @onclick="SearchForVideos">Search</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </TabPanel>
+                    <TabPanel Name="url">
+                        <div class="row" style="margin-bottom: 5px;">
+                            <input  disabled=@IsDownloadActive style="height: 30px; margin-bottom: 7px;" @bind=VideoUrl type="text" placeholder="input youtube video url">
+                        </div>
+                        <div class="row col-12 col-md-8">
+                            <select disabled=@(IsDownloadActive) id="downloadOptionsUrl" name="downloadOptionsUrl" @onchange=DownloadViaUrl class="form-select" aria-label="Default select example">
+                                <option selected>Donwload Options</option>
+                                <option value="video">Download Video</option>
+                                <option value="audio">Download Audio</option>
+                            </select>
+                        </div>
+                    </TabPanel>
+                </Content>
+            </Tabs>
         </div>
-    }
-    else
+    </div>
+
+    <br />
+    @if (IsDownloadActive || DownloadComplete)
     {
         <div class="row center-stuff">
-            <div class="row col-12 col-md-8" style="margin-bottom: 5px;">
-                <div class="embed-container">
-                    <iframe src="https://www.youtube.com/embed/1i-b9-q8Vvs?&enablecastapi=1" allowfullscreen></iframe>
+            <div class="col-12 col-md-8">
+                <div class="progress">
+                    @if (IsDownloadActive)
+                    {
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                             aria-valuenow=@ProgressValue aria-valuemin="0" aria-valuemax="100" style=@ProgressStyle>
+                            @ProgressString
+                        </div>
+                    }
+                    @if (DownloadComplete)
+                    {
+                        <div class="progress-bar" role="progressbar"
+                             aria-valuenow=@ProgressValue aria-valuemin="0" aria-valuemax="100" style=@ProgressStyle>
+                            @ProgressString
+                        </div>
+                    }
                 </div>
             </div>
+            <div style="padding-bottom:20px;" />
         </div>
     }
 
-    <div class="row center-stuff">
-        <div class="row col-12 col-md-8" style="margin-bottom: 5px;">
-            <input class="col-12 col-md-10" disabled=@IsDownloadActive style="height: 30px; margin-bottom: 7px;" @bind=SearchQuery type="text" placeholder="input search term">
-            <div class="col-3 offset-9 col-md-2 offset-md-0" style="margin-bottom: 25px; height: 30px; padding-right:0px!important">
-                <button class="float-right" disabled=@IsDownloadActive @onclick="SearchForVideos">Search</button>
-            </div>
-        </div>
-    </div>
-
-
-<br />
-@if (DownloadProgressList.Any())
-{
-    <div class="row center-stuff">
-        @* <button class="real-center-stuff center-stuff col-5 bg-dark" style="margin-top:20px; color:yellow;" @onclick="CancelDownload">Cancel Download</button> *@
-        <div class="col-12 col-md-8 bg-secondary progress-update">
-            @for (int i = DownloadProgressList.Count - 1; i >= 0; i--)
-            {
-                <p>@DownloadProgressList.ElementAt(i)</p>
-            }
-        </div>
-        <div style="padding-bottom:20px;"/>
-    </div>
-}
-@if (DownloadComplete && DownloadSuccess)
-{
-    <div class="row center-stuff">
-        <div class="col-12 col-md-8 bg-success  progress-complete">
-            <p>Processing is complete! Now downloading to your browser. </p>
-        </div>
-        <div style="margin-bottom:20px;" />
-    </div>
-}
-@if (DownloadComplete && !DownloadSuccess)
-{
-    <div class="row center-stuff">
-        <div class="col-12 col-md-8 bg-danger  progress-complete">
-            <p>Processing failed! See logs for details. </p>
-        </div>
-        <div style="margin-bottom:20px;"/>
-    </div>
-}
-
 </div>
+
 
 <style>
     a.ytp-youtube-button.ytp-button {
@@ -177,17 +195,31 @@
     [Inject]
     public Configuration Config { get; set; }
 
-    private List<YoutubeVideo> Videos { get; set; } = new List<YoutubeVideo>();
+    private List<YoutubeVideo> Videos { get; set; } = new List<YoutubeVideo>() { new YoutubeVideo { Title = "rick roll", VideoId = "dQw4w9WgXcQ" } };
     private string ChosenVideoId { get; set; } = "0";
-    private bool DownloadSuccess = false;
     private bool DownloadComplete = false;
     private bool IsDownloadActive = false;
     private string SearchQuery { get; set; }
-    private List<string> DownloadProgressList = new List<string>();
-    private CancellationTokenSource ctSource = null;
-    private bool CtSourceIsDisposed = false;
-    private Regex regex = new Regex(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.Compiled);
+    private int ProgressValue { get; set; } = 0;
+    private string ProgressString { get; set; }
+    private string ProgressStyle { get; set; }
+    private FluentSizing ProgressWidth { get; set; }
+    private string VideoUrl { get; set; }
+    private Regex YoutubeRegex = new Regex(@"youtu(?:\.be|be\.com)/(?:.*v(?:/|=)|(?:.*/)?)([a-zA-Z0-9-_]+)", RegexOptions.Compiled);
+    private string SelectedTab = "search";
 
+    private Task OnSelectedTabChanged(string name)
+    {
+        SelectedTab = name;
+        if (DownloadComplete)
+        {
+            DownloadComplete = false;
+        }
+
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    
     private async Task DownloadStuff(ChangeEventArgs args)
     {
         if (!int.TryParse(ChosenVideoId, out var index))
@@ -209,9 +241,7 @@
 
     private async Task SearchForVideos()
     {
-        DownloadSuccess = false;
         DownloadComplete = false;
-        DownloadProgressList = new List<string>();
         Videos = new List<YoutubeVideo>();
         StateHasChanged();
 
@@ -227,7 +257,6 @@
             var searchListResponse = await searchListRequest.ExecuteAsync();
             Videos.AddRange(searchListResponse.Items.Select(video => new YoutubeVideo
                 {
-                    Thumbnail = video.Snippet.Thumbnails.High.Url,
                     Title = video.Snippet.Title,
                     VideoId = video.Id.VideoId,
                 }));
@@ -243,15 +272,20 @@
         var youtube = new YoutubeClient();
         var youtubeUrl = $"https://www.youtube.com/watch?v={video.VideoId}";
 
-        DownloadProgressList.Add(mp3Flag ? "Audio format (mp3) chosen for download." : "Video format(mp4) chosen for download.");
-        DownloadProgressList.Add($"[Title] {video.Title}");
-        DownloadProgressList.Add(mp3Flag ? $"Grabbing audio..." : $"Grabbing video...");
+        IsDownloadActive = true;
+        ProgressValue = 25;
+        ProgressStyle = $"width:{ProgressValue}%";
+        ProgressString = "Locating Video - 25%";
         StateHasChanged();
 
         await Task.Delay(200);
         await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
 
         var streamManifest = await youtube.Videos.Streams.GetManifestAsync(youtubeUrl);
+        ProgressValue = 50;
+        ProgressString = "Grabbing Video Bytes - 50%";
+        ProgressStyle = $"width:{ProgressValue}%";
+        StateHasChanged();
         if (mp3Flag)
         {
             // ...or highest bitrate audio-only stream
@@ -266,17 +300,101 @@
         var filename = $"{Guid.NewGuid()}.{streamInfo.Container}";
         var stream = await youtube.Videos.Streams.GetAsync(streamInfo);
         await youtube.Videos.Streams.DownloadAsync(streamInfo, filename);
-        DownloadProgressList.Add(mp3Flag ? $"Downloading audio..." : $"Downloading video...");
+        // DownloadProgressList.Add(mp3Flag ? $"Downloading audio..." : $"Downloading video...");
+        ProgressValue = 75;
+        ProgressString = "Converting Video Bytes - 75%";
+        ProgressStyle = $"width:{ProgressValue}%";
         StateHasChanged();
 
-        await BlazorDownloadFileService.DownloadFileAsync(mp3Flag ? "download.mp3" : "download.mp4", File.ReadAllBytes(filename));
+        await BlazorDownloadFileService.DownloadFileAsync(mp3Flag ? $"{video.Title}.mp3" : $"{video.Title}.mp4", File.ReadAllBytes(filename));
         File.Delete(filename);
-        DownloadProgressList.Add("Download completed");
+        // DownloadProgressList.Add("Download completed");
+        ProgressValue = 100;
+        ProgressString = mp3Flag ? "Audio Downloading": "Video Downloading";
+        ProgressStyle = $"width:{ProgressValue}%";
+        IsDownloadActive = false;
+        DownloadComplete = true;
         StateHasChanged();
 
         await Task.Delay(200);
         await JsRuntime.InvokeVoidAsync("resetSelect");
         await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
+    }
+
+    private async Task DownloadViaUrl(ChangeEventArgs args)
+    {
+        var mp3Flag = false;
+
+        if (args.Value.ToString() == "video")
+        {
+            mp3Flag = false;
+        }
+        else if (args.Value.ToString() == "audio")
+        {
+            mp3Flag = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(VideoUrl))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Paste a Youtube Url");
+            return;
+        }
+        var match = YoutubeRegex.Match(VideoUrl);
+
+        if (!match.Success)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Url is not a youtube video");
+            return;
+        }
+
+        IStreamInfo streamInfo;
+        var youtube = new YoutubeClient();
+
+        IsDownloadActive = true;
+        ProgressValue = 25;
+        ProgressStyle = $"width:{ProgressValue}%";
+        ProgressString = "Locating Video - 25%";
+        StateHasChanged();
+
+        await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
+
+        var streamManifest = await youtube.Videos.Streams.GetManifestAsync(VideoUrl);
+        ProgressValue = 50;
+        ProgressString = "Grabbing Video Bytes - 50%";
+        ProgressStyle = $"width:{ProgressValue}%";
+        StateHasChanged();
+        if (mp3Flag)
+        {
+            // ...or highest bitrate audio-only stream
+            streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+        }
+        else
+        {
+            // Get highest quality muxed stream
+            streamInfo = streamManifest.GetMuxedStreams().GetWithHighestVideoQuality();
+        }
+
+        var filename = $"{Guid.NewGuid()}.{streamInfo.Container}";
+        var stream = await youtube.Videos.Streams.GetAsync(streamInfo);
+        await youtube.Videos.Streams.DownloadAsync(streamInfo, filename);
+
+        ProgressValue = 75;
+        ProgressString = "Converting Video Bytes - 75%";
+        ProgressStyle = $"width:{ProgressValue}%";
+        StateHasChanged();
         
+        await BlazorDownloadFileService.DownloadFileAsync(mp3Flag ? $"download.mp3" : $"download.mp4", File.ReadAllBytes(filename));
+        File.Delete(filename);
+        ProgressValue = 100;
+        ProgressString = mp3Flag ? "Audio Downloading" : "Video Downloading";
+        ProgressStyle = $"width:{ProgressValue}%";
+        IsDownloadActive = false;
+        DownloadComplete = true;
+        StateHasChanged();
+
+        await Task.Delay(200);
+        await JsRuntime.InvokeVoidAsync("resetSelectUrl");
+        await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
     }
 }

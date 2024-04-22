@@ -47,3 +47,7 @@ async function getGpsLocation() {
 function resetSelect() {
     document.getElementById('downloadOptions').selectedIndex = 0;
 }
+
+function resetSelectUrl() {
+    document.getElementById('downloadOptionsUrl').selectedIndex = 0;
+}

@@ -13,7 +13,7 @@
     </div>
     <div class="row center-stuff">
         <div class="col-12 col-md-8">
-            <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+            <Tabs SelectedTab="@SelectedTab" SelectedTabChanged="@OnSelectedTabChanged">
                 <Items>
                     <Tab Name="site">Site</Tab>
                     <Tab Name="claude">Claude</Tab>
@@ -72,7 +72,7 @@
                             <dt class="col-sm-3">Overview</dt>
                             <dd class="col-sm-9">This page allows users to search, watch, and download youtube videos.</dd>
                             <dt class="col-sm-3">Youtube Download</dt>
-                            <dd class="col-sm-9">This leverages the yt-dlp project to be able to gather and download youtube videos. This meant I needed to ensure python was installed and working within my deployment environment. This allows for either mp4 or mp3 download. Currently works locally but not deployed to azure</dd>
+                            <dd class="col-sm-9">This used to leverage the youtube-dl project to be able to gather and download youtube videos. This required python to be installed in Azure and required a lot of manual manipulation of the production service. I recently pivoted to using YoutubeExplode a package that works out of the box in dotnet. This allows for either mp4 or mp3 download.</dd>
                             <dt class="col-sm-3">Embedded Videos</dt>
                             <dd class="col-sm-9">Youtube allows for embedding youtube videos plus I enabled casting (doesn't work on mobile)</dd>
                         </dl>
@@ -109,11 +109,11 @@
 </style>
 
 @code {
-    string selectedTab = "site";
+    string SelectedTab = "site";
 
     private Task OnSelectedTabChanged(string name)
     {
-        selectedTab = name;
+        SelectedTab = name;
 
         return Task.CompletedTask;
     }
