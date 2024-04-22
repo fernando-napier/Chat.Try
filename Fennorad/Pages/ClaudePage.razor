@@ -58,16 +58,20 @@
             </div>
             
             <div class="text-area">
-                @if (IsAwaitingResponse)
+                @* @if (IsAwaitingResponse)
                 {
                     <div class="row center-stuff" style="z-index: 1;">
                         <div class="col-10 col-md-6">
                             <div class="loading">Loading</div>
                         </div>
                     </div>
-                }
+                } *@
                 <div class="row center-stuff" style="z-index: 2;">
                     <div class="col-10 col-md-6">
+                        @if (IsAwaitingResponse)
+                        {
+                          <div class="loading">Loading</div>
+                        }
                         <textarea style="width:100%;" type="text" @onkeydown="SendMessageOnKeyPress" @bind:event="oninput" @bind=NewMessage placeholder="Type a message" />
                     </div>
                 </div>
@@ -269,7 +273,7 @@
             IsAwaitingResponse = false;
             StateHasChanged();
             await Task.Delay(200);
-            await JsRuntime.InvokeVoidAsync("scrollToBottomOfDiv");
+            await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
         }
     }
 
@@ -291,7 +295,7 @@
         StateHasChanged();
 
         await Task.Delay(200);
-        await JsRuntime.InvokeVoidAsync("scrollToBottomOfDiv");
+        await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
 
         try
         {
