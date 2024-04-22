@@ -55,25 +55,29 @@
                     }
                     
                 }
-            </div>   
+            </div>
+            
+            <div class="text-area">
+                @if (IsAwaitingResponse)
+                {
+                    <div class="row center-stuff" style="z-index: 1;">
+                        <div class="col-10 col-md-6">
+                            <div class="loading">Loading</div>
+                        </div>
+                    </div>
+                }
+                <div class="row center-stuff" style="z-index: 2;">
+                    <div class="col-10 col-md-6">
+                        <textarea style="width:100%;" type="text" @onkeydown="SendMessageOnKeyPress" @bind:event="oninput" @bind=NewMessage placeholder="Type a message" />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    @if(IsAwaitingResponse)
-    {
-        <div class="row center-stuff">
-            <div class="col-12 col-md-8">
-                <div class="loading">Loading</div>
-            </div>
-        </div>
-    }
-           
-            
-    <div class="row center-stuff">
-        <div class="col-12 col-md-8">
-            <textarea type="text" class="text-area" @onkeydown="SendMessageOnKeyPress" @bind:event="oninput" @bind=NewMessage placeholder="Type a message" />
-        </div>
-    </div>
+    
+
+    
 </div>
 
 
@@ -162,8 +166,12 @@
     }
 
     .text-area {
-        resize: vertical;
+        resize: none;
         width: 100%;
+        position:  fixed;
+        bottom: 20px;
+        left: 0;
+        height: 40px;
     }
 
     .float-parent-element {
@@ -184,8 +192,8 @@
 
     .msg_history {
         display: flex;
-        max-height: 400px;
-        overflow-y: scroll;
+        overflow-y: hidden;
+        margin: 0 0 40px 0;
     }
 
     .received_msg {
@@ -201,6 +209,7 @@
 
     .loading {
       font-size: 15px;
+      padding-bottom: 40px;
     }
 
     .loading:after {
@@ -251,7 +260,7 @@
     private async Task SendMessageOnKeyPress(KeyboardEventArgs e)
     {
         if (e.Key == "Enter" || e.Code == "Enter" || e.Code == "NumpadEnter")
-    {
+        {
             IsAwaitingResponse = true;
             await Task.Delay(1);
 
@@ -328,6 +337,10 @@
                 MessageList.RemoveAt(0);
                 MessageList.RemoveAt(0);
             }
+
+            StateHasChanged();
+            await Task.Delay(200);
+            await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
         } 
         catch (Exception ex)
         {
