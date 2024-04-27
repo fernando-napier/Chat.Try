@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Fennorad.AnthropicClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,15 +66,7 @@ builder.Services.AddScoped<IHostEnvironmentAuthenticationStateProvider>(sp => {
     var provider = (ServerAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>();
     return provider;
 });
-builder.Services.AddHttpClient("anthropic", (serviceProvider, client) =>
-{
-    var config = serviceProvider
-        .GetRequiredService<Configuration>();
-    client.DefaultRequestHeaders.Add("x-api-key", config.AnthropicApiKey);
-    client.DefaultRequestHeaders.Add("anthropic-version", config.AnthropicVersion);
-
-    client.BaseAddress = new Uri(config.AnthropicBaseAddress);
-});
+builder.Services.RegisterAnthropicClient(builder.Configuration.GetValue<string>("AnthropicApiKey"));
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSignalR();
