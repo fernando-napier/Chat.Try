@@ -15,9 +15,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fennorad.DbUp", "Fennorad.DbUp\Fennorad.DbUp.csproj", "{48DAA7F9-F0E1-4248-927F-935C250B5478}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fennorad.React", "Fennorad.React\Fennorad.React.csproj", "{26E76C45-3BDC-4B90-83A7-14D209CF70CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fennorad.React", "Fennorad.React\Fennorad.React.csproj", "{26E76C45-3BDC-4B90-83A7-14D209CF70CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fennorad.Models", "Fennorad.Models\Fennorad.Models.csproj", "{67E6E87E-F540-4B04-A7D3-E9311EC1BD58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fennorad.Models", "Fennorad.Models\Fennorad.Models.csproj", "{67E6E87E-F540-4B04-A7D3-E9311EC1BD58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
