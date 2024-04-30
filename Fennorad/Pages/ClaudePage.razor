@@ -306,12 +306,6 @@
             var inputToken = 0;
             await foreach (var sseMessage in _client.SendMessageStreamAsync(request))
             {
-                Console.WriteLine("---------------");
-                if (sseMessage.Data != null)
-                {
-                    Console.WriteLine(JsonConvert.SerializeObject(sseMessage));
-                }
-
                 if (sseMessage.EventName == "message_start")
                 {
                     inputToken = sseMessage.Data.Message.Usage.InputTokens;
@@ -364,13 +358,6 @@
                     Data = base64File,
                     MediaType = e.Files.First().Type,
                 };
-
-            // // Use the stream reader to read the content of uploaded file,
-            // // in this case we can assume it is a textual file.
-            // using (var reader = new StreamReader(stream))
-            // {
-            //     fileContent = await reader.ReadToEndAsync();
-            // }
         }
 
         
