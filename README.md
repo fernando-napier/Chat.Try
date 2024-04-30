@@ -19,16 +19,16 @@ https://fennorad.azurewebsites.net/claude
 <h3> Chat </h3>  
 https://fennorad.azurewebsites.net/chat
 
-#### To access this feature create an account or use the example user:
-
-User: `example-user`  
-Password: `password` 
-
 1) Allows any registered user to search for and chat with any existing user.
 2) Currently only text can be sent from one user to another
 3) User conversations, messages, and read receipts are stored to maintain a historical record of conversations
 4) Any unread user conversation will result in the user being alerted to new messages via the conversation tile flashing
 5) Can only be accessed by authenticated users
+
+#### To access this feature create an account or use the example user:
+
+User: `example-user`  
+Password: `password` 
 
 <h3> Maps </h3>
 https://fennorad.azurewebsites.net/maps
