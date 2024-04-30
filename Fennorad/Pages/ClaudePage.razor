@@ -4,6 +4,7 @@
 @using Blazor.DownloadFileFast.Interfaces;
 @using System.Text.RegularExpressions;
 @using Fennorad.AnthropicClient
+@using Fennorad.AnthropicClient.Models
 @using Fennorad.Models;
 @using System;
 @using Newtonsoft.Json.Linq;
@@ -57,32 +58,16 @@
                     
                 }
             </div>
-            
-            <div class="text-area">
-                @* @if (IsAwaitingResponse)
-                {
-                    <div class="row center-stuff" style="z-index: 1;">
-                        <div class="col-10 col-md-6">
-                            <div class="loading">Loading</div>
-                        </div>
-                    </div>
-                } *@
-                <div class="row center-stuff" style="z-index: 2;">
-                    <div class="col-10 col-md-6">
-                        @if (IsAwaitingResponse)
-                        {
-                          <div class="loading">Loading</div>
-                        }
-                        <textarea style="width:100%;" type="text" @onkeydown="SendMessageOnKeyPress" @bind:event="oninput" @bind=NewMessage placeholder="Type a message" />
-                    </div>
-                </div>
-            </div>
+            @if (IsAwaitingResponse)
+            {
+                <div class="loading">Loading</div>
+            }
+            <Field>
+                <FileEdit AutoReset=false DisableProgressReport=true Changed="OnFileUpload" Filter="image/jpeg, image/png, image/gif"></FileEdit>
+            </Field>
+            <textarea style="width:100%;" type="text" @onkeydown="SendMessageOnKeyPress" @bind:event="oninput" @bind=NewMessage placeholder="Type a message" />
         </div>
     </div>
-
-    
-
-    
 </div>
 
 
@@ -171,11 +156,7 @@
     }
 
     .text-area {
-        resize: none;
-        width: 100%;
-        position:  fixed;
         bottom: 20px;
-        left: 0;
         height: 40px;
     }
 
@@ -250,6 +231,7 @@
     private List<ClaudeMessage> MessageList { get; set; } = new();
     private string NewMessage { get; set; }
     private bool IsAwaitingResponse { get; set; }
+    private Fennorad.AnthropicClient.Models.ImageSource ImageData { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -275,7 +257,7 @@
 
             IsAwaitingResponse = false;
             StateHasChanged();
-            await Task.Delay(200);
+            await Task.Delay(1);
             await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
         }
     }
@@ -289,11 +271,14 @@
         }
 
         MessageList.Add(new ClaudeMessage
-            {
-                CreatedOn = DateTimeOffset.Now,
-                IsFromClaude = false,
-                Message = NewMessage
-            });
+        {
+            CreatedOn = DateTimeOffset.Now,
+            IsFromClaude = false,
+            Message = NewMessage,
+            Base64Image = ImageData != null ? ImageData.Data : null,
+            MediaType = ImageData != null ? ImageData.MediaType : null,
+        });
+
         NewMessage = string.Empty;
         StateHasChanged();
 
@@ -303,27 +288,41 @@
         try
         {
             var client = HttpClientFactory.CreateClient("anthropic");
+            var messages = ProcessMessages();
             var request = new Fennorad.AnthropicClient.Models.AnthropicRequest
                 {
                     MaxTokens = 2000,
                     Model = Fennorad.AnthropicClient.Models.ClaudeModel.Claude_3_Haiku,
-                    Messages = MessageList.Select(x => new Fennorad.AnthropicClient.Models.AnthropicMessage
-                    {
-                        Role = x.IsFromClaude ? Fennorad.AnthropicClient.Models.Role.Assistant : Fennorad.AnthropicClient.Models.Role.User,
-                        Content = x.Message,
-                    }).ToList(),
+                    Messages = messages,
                 };
 
-            var anthropicResponse = await _client.SendMessageAsync(request);
             MessageList.Add(new ClaudeMessage
                 {
                     IsFromClaude = true,
-                    Message = anthropicResponse.Content.First().Text,
-                    CreatedOn = DateTimeOffset.Now
+                    Message = "",
+                    CreatedOn = DateTimeOffset.Now,
                 });
+            var sb = new StringBuilder();
+            var inputToken = 0;
+            await foreach (var sseMessage in _client.SendMessageStreamAsync(request))
+            {
+                if (sseMessage.EventName == "message_start")
+                {
+                    inputToken = sseMessage.Data.Message.Usage.InputTokens;
+                }
+
+                if (sseMessage.EventName == "content_block_delta")
+                {
+                    sb.Append(sseMessage.Data.Delta.Text);
+                    MessageList.Last().Message = sb.ToString();
+                    StateHasChanged();
+                    await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
+                    await Task.Delay(1);
+                }
+            }
 
             await ProtectedSessionStore.SetAsync("messages", MessageList);
-            if (anthropicResponse.Usage.InputTokens > 1000)
+            if (inputToken > 2000)
             {
                 MessageList.RemoveAt(0);
                 MessageList.RemoveAt(0);
@@ -337,5 +336,80 @@
         {
             Console.WriteLine(ex.Message);
         }
+    }
+
+    private async Task OnFileUpload(FileChangedEventArgs e)
+    {
+        var file = e.Files.First();
+
+        using (var stream = new MemoryStream())
+        {
+            // Here we're telling the FileEdit where to write the upload result
+            await file.WriteToStreamAsync(stream);
+
+            // Once we reach this line it means the file is fully uploaded.
+            // In this case we're going to offset to the beginning of file
+            // so we can read it.
+            stream.Seek(0, SeekOrigin.Begin);
+            var bytes = stream.ToArray();
+            var base64File = Convert.ToBase64String(bytes);
+            ImageData = new Fennorad.AnthropicClient.Models.ImageSource
+                {
+                    Data = base64File,
+                    MediaType = e.Files.First().Type,
+                };
+        }
+    }
+
+    private List<AnthropicMessage> ProcessMessages()
+    {
+        var messages = new List<AnthropicMessage>();
+        foreach (var msg in MessageList)
+        {
+            if (msg.IsFromClaude)
+            {
+                messages.Add(new AnthropicMessage
+                    {
+                        Role = Role.Assistant,
+                        Content = new List<Content>
+                        {
+                            new Content
+                            {
+                                Type = Fennorad.AnthropicClient.Models.Type.Text,
+                                Text = msg.Message,
+                            }
+                        }
+                    });
+            }
+            else
+            {
+                var contentList = new List<Content>();
+                contentList.Add(new Content
+                    {
+                        Type = Fennorad.AnthropicClient.Models.Type.Text,
+                        Text = msg.Message,
+                    });
+                if (!string.IsNullOrWhiteSpace(msg.MediaType) && !string.IsNullOrWhiteSpace(msg.Base64Image))
+                {
+                    contentList.Add(new Content
+                    {
+                        Type = Fennorad.AnthropicClient.Models.Type.Image,
+                        Source = new ImageSource
+                        {
+                            Data = msg.Base64Image,
+                            MediaType = msg.MediaType,
+                        }
+                    });
+                }
+
+                messages.Add(new AnthropicMessage
+                    {
+                        Content = contentList,
+                        Role = Role.User
+                    });
+            }
+        }
+
+        return messages;
     }
 }
