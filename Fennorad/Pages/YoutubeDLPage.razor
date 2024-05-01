@@ -219,7 +219,7 @@
         StateHasChanged();
         return Task.CompletedTask;
     }
-    
+
     private async Task DownloadStuff(ChangeEventArgs args)
     {
         if (!int.TryParse(ChosenVideoId, out var index))
@@ -247,6 +247,11 @@
 
         if (!string.IsNullOrWhiteSpace(SearchQuery))
         {
+            if (SearchQuery.Contains("youtu.be"))
+            {
+                var uri = new Uri(SearchQuery);
+                SearchQuery = uri.LocalPath;
+            }
             var searchListRequest = YoutubeService.Search.List("snippet");
             searchListRequest.Q = SearchQuery;
             searchListRequest.Type = "video";
