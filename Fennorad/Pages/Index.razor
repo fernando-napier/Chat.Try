@@ -30,78 +30,78 @@
 
 
                 <NotAuthorized>
-                            <h2>Hello, user!</h2>
-                    <p>In order to authenticate and use the <a href="chat">Chat</a> functionality then <a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+                    <h2>Hello, user!</h2>
+                    <p><a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
                 </NotAuthorized>
  
             </AuthorizeView>
             <br />
         </div>
-        <div class="row center-stuff">
-            <div class="col-12 col-md-8">
-                <h3>Currently Available Functionality</h3>
-                <Carousel Crossfade=true Interval=10000 Style="height:400px;" @bind-SelectedSlide=@SelectedSlide >
+    </div>
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <h3>Currently Available Functionality</h3>
+            <Carousel Crossfade=true Interval=10000 Style="height:400px;" @bind-SelectedSlide=@SelectedSlide >
                     
-                    <CarouselSlide Name="1">
-                        <Card>
-                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDFtMGppbW54MXo5NWlndXF0eXU1MWo5MmhweDh6d2ZzZDJjMDZ3biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1n92hYPiFQ0efcCtrF/giphy.gif" Alt="claude.gif"></CardImage>
-                            <hr />
-                            <CardBody>
-                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="claude" Target="Target.Parent">Chat with Claude</Button></CardTitle>
-                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
-                                    This page allows users to chat with a generative AI Claude.
-                                </CardText>
-                            </CardBody>
-                        </Card>
-                    </CarouselSlide>
-                    <CarouselSlide Name="2">
-                        <Card>
-                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/qKCvrZLXLwvzcjMKQ5/giphy.gif?cid=ecf05e47wpm2mzaa70by28nj1pr47obu9u9uqh54u01bfvqc&ep=v1_gifs_search&rid=giphy.gif&ct=g" Alt="chat.gif"></CardImage>
-                            <hr />
-                            <CardBody>
-                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="chat" Target="Target.Parent">Chat with other Users</Button></CardTitle>
-                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
-                                    This page allows users to chat with other users and stores conversations. Login to try it out. (User: example-user Password: password)
-                                </CardText>
-                            </CardBody>
-                        </Card>
-                    </CarouselSlide>
-                    <CarouselSlide Name="3">
-                        <Card>
-                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/ildLrpK7sOV9ky6NOf/giphy.gif" Alt="maps.gif"></CardImage>
-                            <CardBody>
-                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="maps" Target="Target.Parent">Use Maps to Navigate</Button></CardTitle>
-                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
-                                    This is a navigation page that allows for a user to get directions from one place to another.
-                                </CardText>
-                            </CardBody>
-                        </Card>
-                    </CarouselSlide>
-                    <CarouselSlide Name="4">
-                        <Card>
-                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/13Nc3xlO1kGg3S/giphy.gif" Alt="youtube.gif"></CardImage>
-                            <hr />
-                            <CardBody>
-                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="youtube" Target="Target.Parent">Watch Or Download Youtube Videos</Button></CardTitle>
-                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
-                                    This is a page that allows you to search for, play, cast, and download videos (mp3 or mp4).
-                                </CardText>
-                            </CardBody>
-                        </Card>
-                    </CarouselSlide>
-                    <CarouselSlide Name="5">
-                        <Card>
-                            <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/3oEjHWbXcpeKhTktXi/giphy.gif" Alt="beautify.gif"></CardImage>
-                            <CardBody>
-                                <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="beautify" Target="Target.Parent">Beautify your JSON/XML</Button></CardTitle>
-                                <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
-                                    This page allows you to paste either JSON or XML and return a pretty print version of the object.
-                                </CardText>
-                            </CardBody>
-                        </Card>
-                    </CarouselSlide>
-                </Carousel>
-            </div>
+                <CarouselSlide Name="1">
+                    <Card>
+                        <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDFtMGppbW54MXo5NWlndXF0eXU1MWo5MmhweDh6d2ZzZDJjMDZ3biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1n92hYPiFQ0efcCtrF/giphy.gif" Alt="claude.gif"></CardImage>
+                        <hr />
+                        <CardBody>
+                            <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="claude" Target="Target.Parent">Chat with Claude</Button></CardTitle>
+                            <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                This page allows users to chat with a generative AI Claude.
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </CarouselSlide>
+                <CarouselSlide Name="2">
+                    <Card>
+                        <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/qKCvrZLXLwvzcjMKQ5/giphy.gif?cid=ecf05e47wpm2mzaa70by28nj1pr47obu9u9uqh54u01bfvqc&ep=v1_gifs_search&rid=giphy.gif&ct=g" Alt="chat.gif"></CardImage>
+                        <hr />
+                        <CardBody>
+                            <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="chat" Target="Target.Parent">Chat with other Users</Button></CardTitle>
+                            <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                This page allows users to chat with other users and stores conversations. Login to try it out. (User: example-user Password: password)
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </CarouselSlide>
+                <CarouselSlide Name="3">
+                    <Card>
+                        <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/ildLrpK7sOV9ky6NOf/giphy.gif" Alt="maps.gif"></CardImage>
+                        <CardBody>
+                            <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="maps" Target="Target.Parent">Use Maps to Navigate</Button></CardTitle>
+                            <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                This is a navigation page that allows for a user to get directions from one place to another.
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </CarouselSlide>
+                <CarouselSlide Name="4">
+                    <Card>
+                        <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/13Nc3xlO1kGg3S/giphy.gif" Alt="youtube.gif"></CardImage>
+                        <hr />
+                        <CardBody>
+                            <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="youtube" Target="Target.Parent">Watch Or Download Youtube Videos</Button></CardTitle>
+                            <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                This is a page that allows you to search for, play, cast, and download videos (mp3 or mp4).
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </CarouselSlide>
+                <CarouselSlide Name="5">
+                    <Card>
+                        <CardImage Style="width:100%; height: 280px;" Source="https://media.giphy.com/media/3oEjHWbXcpeKhTktXi/giphy.gif" Alt="beautify.gif"></CardImage>
+                        <CardBody>
+                            <CardTitle Size="5"><Button Color="Color.Primary" Type="ButtonType.Link" To="beautify" Target="Target.Parent">Beautify your JSON/XML</Button></CardTitle>
+                            <CardText Style="overflow-y: auto; width: 100%; height: 50px;">
+                                This page allows you to paste either JSON or XML and return a pretty print version of the object.
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </CarouselSlide>
+            </Carousel>
         </div>
     </div>
 </div>
