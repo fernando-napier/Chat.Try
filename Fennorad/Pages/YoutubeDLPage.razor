@@ -244,16 +244,17 @@
         DownloadComplete = false;
         Videos = new List<YoutubeVideo>();
         StateHasChanged();
-
         if (!string.IsNullOrWhiteSpace(SearchQuery))
         {
-            if (SearchQuery.Contains("youtu.be"))
+            var search = SearchQuery;
+            if (SearchQuery.Contains("youtu.be") || SearchQuery.Contains("/live/"))
             {
                 var uri = new Uri(SearchQuery);
-                SearchQuery = uri.LocalPath;
+                search = uri.LocalPath;
             }
+
             var searchListRequest = YoutubeService.Search.List("snippet");
-            searchListRequest.Q = SearchQuery;
+            searchListRequest.Q = search;
             searchListRequest.Type = "video";
             searchListRequest.VideoEmbeddable = SearchResource.ListRequest.VideoEmbeddableEnum.True__;
             searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Relevance;
@@ -266,7 +267,7 @@
                     VideoId = video.Id.VideoId,
                 }));
             StateHasChanged();
-            await Task.Delay(1000);
+            await Task.Delay(1);
         }
 
     }
