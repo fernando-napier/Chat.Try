@@ -269,8 +269,6 @@
 
             IsAwaitingResponse = false;
             StateHasChanged();
-            await Task.Delay(1);
-            await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
         }
     }
 
@@ -354,10 +352,6 @@
                 MessageList.RemoveAt(0);
                 MessageList.RemoveAt(0);
             }
-
-            StateHasChanged();
-            await Task.Delay(1);
-            await JsRuntime.InvokeVoidAsync("scrollWindowToBottom");
         } 
         catch (Exception ex)
         {
