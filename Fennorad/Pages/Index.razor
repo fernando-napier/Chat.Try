@@ -18,20 +18,22 @@
                 <Authorized>
                     @if(user != null)
                     {
-                        <h2>Hello, @user.Identity.Name!</h2>
-                        <p>Thank you for joining us today</p>
+                        <h2>Welcome back to Fennorad, @user.Identity.Name!</h2>
+                        <hr />
                     }
                     else
                     {
                         <h2>Hello, User!</h2>
                         <p>There are some issues with your login. Log back in to remedy the issue :)</p>
+                        <hr />
                     }
                 </Authorized>
 
 
                 <NotAuthorized>
-                    <h2>Hello, user!</h2>
-                    <p><a href="Identity/Account/Login">Login</a> or <a href="Identity/Account/Register">Register</a></p>
+                    <h2>Welcome to Fennorad!</h2>
+                    <p>This is a project I am actively working on with separate pages with wildy different functionality.</p>
+                    <hr />
                 </NotAuthorized>
  
             </AuthorizeView>
