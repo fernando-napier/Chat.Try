@@ -50,6 +50,7 @@
                     <Tab Name="maps">Maps</Tab>
                     <Tab Name="youtube">Youtube</Tab>
                     <Tab Name="beautify">Beautify</Tab>
+                    <Tab Name="imagegen">Image Gen</Tab>
                 </Items>
                 <Content>
                     <TabPanel Name="site">
@@ -112,6 +113,16 @@
                             <dd class="col-sm-9">This page allows users to take JSON/XML strings and makes them pretty.</dd>
                             <dt class="col-sm-3">Why does this matter?</dt>
                             <dd class="col-sm-9">I work with 3rd party APIs and when dealing with responses from code causes the returned objects to be minified. It helps to format the JSON/XML objects into a palatable format to properly asses the objects.</dd>
+                        </dl>
+                    </TabPanel>
+                    <TabPanel Name="imagegen">
+                        <dl class="row" style="margin-top:10px;">
+                            <dt class="col-sm-3">Overview</dt>
+                            <dd class="col-sm-9">This page allows users to generate images using OpenApi's DALL-E 3.</dd>
+                            <dt class="col-sm-3">Image Display & Download</dt>
+                            <dd class="col-sm-9">If you generate more than one image it will be added to the image carousel. Can download image either by right clicking and saving or by clicking the download button.</dd>
+                            <dt class="col-sm-3">Image Storage</dt>
+                            <dd class="col-sm-9">Currently this project does not store generated images but have considered either storing as base64 encoded strings in a SQL Server table or in Azure Blob Storage</dd>
                         </dl>
                     </TabPanel>
                 </Content>
