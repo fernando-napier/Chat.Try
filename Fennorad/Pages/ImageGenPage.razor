@@ -1,0 +1,281 @@
+﻿@page "/imagegen"
+@using System.Diagnostics;
+@using System.Text;
+@using Blazor.DownloadFileFast.Interfaces;
+@using System.Text.RegularExpressions;
+@using Fennorad.AnthropicClient
+@using Fennorad.AnthropicClient.Models
+@using Fennorad.Models;
+@using System;
+@using Fennorad.Models.Models
+@using Newtonsoft.Json.Linq;
+@using Newtonsoft.Json;
+@using System.Xml;
+@using System.Xml.Linq;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using OpenAI_API.Images
+@inject IJSRuntime JsRuntime
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+<div class="container">
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <h2>Generate Images</h2>
+            <p>In this page you can generate images using DALLE-3 by OpenAI. (Images last an hour so download em while you can)</p>
+            <hr />
+        </div>
+    </div>    
+    <div class="row center-stuff">
+        <div class="col-12 col-md-8">
+            <textarea style="width:100%;" type="text" @onkeydown="SendMessageOnKeyPress" @bind:event="oninput" @bind=NewMessage placeholder="Type a message" />
+            @if (IsAwaitingResponse)
+            {
+                <div class="loading">Loading</div>
+            }
+            @if (GenImages.Any())
+            {
+                var count = GenImages.Count;
+                <Carousel @bind-SelectedSlide=@ChosenImageId Autoplay="false" AutoRepeat="false">
+                    @for (int i = count - 1; i >= 0; i--)
+                    {
+                        var image = GenImages.ElementAt(i);
+                        <CarouselSlide Name=@i.ToString()>
+                            <img style="width:100%;" src="@image.ImageUrl" alt="@image.AltText" />
+                            <p>Prompt: @image.AltText</p>
+                            <br />
+                        </CarouselSlide>
+                    }
+                </Carousel>
+                <button @onclick="DownloadImage">
+                    Download File From URL
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<style>
+    .time_date {
+        color: #747474;
+        display: block;
+        font-size: 12px;
+        margin: 8px 0 0;
+    }
+
+    .sent_withd_msg p {
+        background: #05728f none repeat scroll 0 0;
+        border-radius: 3px;
+        font-size: 14px;
+        margin: 0;
+        color: #fff;
+        padding: 5px 10px 5px 12px;
+        width: 100%;
+    }
+
+    .sent_msg p {
+        display: inline-block;
+        padding: 0 0 0 10px;
+        vertical-align: top;
+        width: 92%;
+    }
+
+    .sent_msg {
+        float: right;
+        width: 60%;
+    }
+    
+    .outgoing_msg {
+        margin: 26px 0 26px;
+    }
+
+    .received_withd_msg p {
+        background: #ebebeb none repeat scroll 0 0;
+        border-radius: 3px;
+        color: #646464;
+        font-size: 14px;
+        margin: 0;
+        padding: 5px 10px 5px 12px;
+        width: 100%;
+    }
+
+    .received_msg {
+        display: inline-block;
+        padding: 0 0 0 10px;
+        vertical-align: top;
+        width: 92%;
+    }
+
+    .incoming_msg {
+        margin: 26px 0 26px;
+    }
+
+    .received_withd_msg {
+        width: 100%;
+    }
+
+    .float-right {
+        float: right;
+    }
+
+    .center-stuff {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+
+    .container {
+        justify-content: space-evenly;
+        justify-items: center;
+        align-content: space-evenly;
+        align-items: center;
+    }
+
+    .fixed-height {
+        height: 39px;
+    }
+
+    .text-area {
+        bottom: 20px;
+        height: 40px;
+    }
+
+    .float-parent-element {
+        width: 100%;
+        display: block;
+    }
+
+    .float-child-element-left {
+        float: left;
+        width: 50% !important;
+    }
+
+    .float-child-element-right {
+        margin-left: 10px;
+        float: left;
+        width: 35px !important;
+    }
+
+    .msg_history {
+        display: flex;
+        overflow-y: hidden;
+        margin: 0 0 40px 0;
+    }
+
+    .received_msg {
+        display: inline-block;
+        padding: 0 0 0 10px;
+        vertical-align: top;
+        width: 92%;
+    }
+
+    .pre-wrap {
+        white-space: pre-wrap;
+    }
+
+    .loading {
+      font-size: 15px;
+      padding-bottom: 40px;
+    }
+
+    .loading:after {
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: bottom;
+      -webkit-animation: ellipsis steps(4,end) 900ms infinite;      
+      animation: ellipsis steps(4,end) 900ms infinite;
+      content: "\2026"; /* ascii code for the ellipsis character */
+      width: 0px;
+    }
+
+    @@keyframes ellipsis {
+      to {
+        width: 1.25em;    
+      }
+    }
+
+    @@-webkit-keyframes ellipsis {
+      to {
+        width: 1.25em;    
+      }
+    }
+</style>
+
+@code {
+    [Inject]
+    OpenAI_API.OpenAIAPI ApiClient { get; set; }
+    [Inject]
+    public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    [Inject]
+    private IHttpClientFactory HttpClientFactory { get; set; }
+
+    private string NewMessage { get; set; }
+    private string Url { get; set; }
+    private bool IsAwaitingResponse { get; set; }
+    private List<GenImage> GenImages { get; set; } = new();
+    private string ChosenImageId { get; set; } = "0";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await ProtectedSessionStore.GetAsync<List<GenImage>>("imageList");
+            if (result.Success)
+            {
+                GenImages = result.Value;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task DownloadImage()
+    {
+        if (!int.TryParse(ChosenImageId, out var index))
+        {
+            return;
+        }
+
+        var image = GenImages.ElementAt(index);
+        var httpClient = HttpClientFactory.CreateClient();
+        var response = await httpClient.GetAsync(image.ImageUrl);
+        var imageBytes = await response.Content.ReadAsByteArrayAsync();
+        await BlazorDownloadFileService.DownloadFileAsync($"{image.AltText}.png", imageBytes);
+    }
+
+
+    private async Task SendMessageOnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" || e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            IsAwaitingResponse = true;
+            await Task.Delay(1);
+            try
+            {
+                var response = await ApiClient.ImageGenerations.CreateImageAsync(new ImageGenerationRequest(NewMessage, OpenAI_API.Models.Model.DALLE3, ImageSize._1024));
+
+                Url = response.Data.FirstOrDefault().Url;
+                GenImages.Add(new GenImage
+                    {
+                        ImageUrl = Url,
+                        AltText = NewMessage,
+                    });
+
+                await ProtectedSessionStore.SetAsync("imageList", GenImages);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await JsRuntime.InvokeVoidAsync("alert", ex.Message);
+            }
+
+            IsAwaitingResponse = false;
+            StateHasChanged();
+
+        }
+    }
+
+}

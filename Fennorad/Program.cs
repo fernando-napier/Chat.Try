@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Fennorad.AnthropicClient;
+using OpenAI_API;
+using Fennorad.Pages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +30,8 @@ builder.Services.AddSingleton<Configuration>(opt =>
         FfmpegPath = builder.Configuration.GetValue<string>("FfmpegPath"),
         AnthropicBaseAddress = builder.Configuration.GetValue<string>("AnthropicBaseAddress"),
         AnthropicApiKey = builder.Configuration.GetValue<string>("AnthropicApiKey"),
-        AnthropicVersion = builder.Configuration.GetValue<string>("AnthropicVersion")
+        AnthropicVersion = builder.Configuration.GetValue<string>("AnthropicVersion"),
+        OpenAiApiKey = builder.Configuration.GetValue<string>("OpenAiApiKey"),
     };
 });
 
@@ -75,6 +78,7 @@ builder.Services.AddResponseCompression(opts =>
 {
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 });
+builder.Services.AddHttpClient();
 builder.Services.AddBlazorDownloadFile();
 builder.Services.AddSingleton(new YouTubeService(new BaseClientService.Initializer()
 {
@@ -82,6 +86,7 @@ builder.Services.AddSingleton(new YouTubeService(new BaseClientService.Initializ
     ApplicationName = "youtube-app-141704",
 
 }));
+builder.Services.AddSingleton(new OpenAIAPI(builder.Configuration.GetValue<string>("OpenAiApiKey")));
 builder.Services
     .AddBlazorise(options =>
     {

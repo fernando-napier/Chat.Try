@@ -9,6 +9,7 @@
         public string AnthropicBaseAddress { get; set; }
         public string AnthropicApiKey { get; set; }
         public string AnthropicVersion { get; set; }
+        public string OpenAiApiKey { get; set; }
 
     }
 }
