@@ -10,5 +10,7 @@ namespace Fennorad.Models.Models
     {
         public string AltText { get; set; }
         public string ImageUrl { get; set; }
+        public DateTimeOffset ExpirationDate { get; set; }
+        public TimeSpan ExpiresIn { get; set; }
     }
 }

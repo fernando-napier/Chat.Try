@@ -40,8 +40,9 @@
                     {
                         var image = GenImages.ElementAt(i);
                         <CarouselSlide Name=@i.ToString()>
-                            <img style="width:100%;" src="@image.ImageUrl" alt="@image.AltText" />
+                            <img style="width:100%;" src="@image.ImageUrl" />
                             <p>Prompt: @image.AltText</p>
+                            <p class="@(image.ExpirationDate > DateTimeOffset.Now ? "" : "text-danger")">Expiration: @(image.ExpiresIn.ToString("mm\\:ss"))</p>
                             <br />
                         </CarouselSlide>
                     }
@@ -218,6 +219,16 @@
     private bool IsAwaitingResponse { get; set; }
     private List<GenImage> GenImages { get; set; } = new();
     private string ChosenImageId { get; set; } = "0";
+    private System.Timers.Timer Timer { get; set; }
+
+    private async Task UpdateTimers()
+    {
+        if (GenImages.Any())
+        {
+            GenImages.ForEach(x => x.ExpiresIn = x.ExpirationDate - DateTimeOffset.Now);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -228,6 +239,14 @@
             {
                 GenImages = result.Value;
             }
+            if (Timer == null)
+            {
+                Timer = new System.Timers.Timer();
+                Timer.Interval = 1000;
+                Timer.Elapsed += async (_, _) => await UpdateTimers();
+                Timer.Enabled = true;
+            }
+           
             StateHasChanged();
         }
     }
@@ -258,15 +277,16 @@
                 var response = await ApiClient.ImageGenerations.CreateImageAsync(new ImageGenerationRequest(NewMessage, OpenAI_API.Models.Model.DALLE3, ImageSize._1024));
 
                 Url = response.Data.FirstOrDefault().Url;
-                GenImages.Add(new GenImage
+                GenImages.Insert(0, new GenImage
                     {
                         ImageUrl = Url,
                         AltText = NewMessage,
+                        ExpirationDate = DateTimeOffset.Now.AddHours(1),
                     });
 
                 await ProtectedSessionStore.SetAsync("imageList", GenImages);
 
-                ChosenImageId = (GenImages.Count - 1).ToString();
+                ChosenImageId = "0";
             }
             catch(Exception ex)
             {
