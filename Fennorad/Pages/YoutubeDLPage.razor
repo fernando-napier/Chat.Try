@@ -19,7 +19,7 @@
 <div class="container">
     <div class="row center-stuff">
         <div class="col-12 col-md-8">
-            <h2>YoutubeDL</h2>
+            <h2>Youtube</h2>
             <p>This is an experimental page where users are allowed to search, watch, and even download youtube videos.</p>
             <hr />
         </div>
@@ -65,7 +65,7 @@
                             <div class="row center-stuff">
                                 <div class="row" style="margin-bottom: 5px;">
                                     <div class="embed-container">
-                                        <iframe src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" allowfullscreen></iframe>
+                                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -211,6 +211,10 @@
     [Inject]
     public Configuration Config { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "video")]
+    public string? QueryParamVideo { get; set; }
+
     private List<YoutubeVideo> Videos { get; set; } = new List<YoutubeVideo>() { new YoutubeVideo { Title = "rick roll", VideoId = "dQw4w9WgXcQ" } };
     private string ChosenVideoId { get; set; } = "0";
     private bool DownloadComplete = false;
@@ -234,6 +238,13 @@
             {
                 RecentSearches = result.Value;
             }
+
+            if (!string.IsNullOrWhiteSpace(QueryParamVideo))
+            {
+                SearchQuery = QueryParamVideo;
+                await SearchForVideos();
+            }
+
             StateHasChanged();
         }
     }
